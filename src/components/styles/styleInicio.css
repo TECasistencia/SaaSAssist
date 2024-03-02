@@ -1,0 +1,25 @@
+body {
+  background: rgb(196, 202, 231);
+}
+
+.footer {
+  position: fixed;
+  left: 0;
+  bottom: 0;
+  width: 100%;
+  text-align: center;
+}
+
+.cameraMedia {
+  background: gray;
+  color: aliceblue;
+}
+
+.grid_container {
+  top: 1000px;
+}
+
+.box {
+  margin-top: 20px;
+  margin-left: 20px;
+}
