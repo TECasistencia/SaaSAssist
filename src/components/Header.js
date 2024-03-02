@@ -1,9 +1,9 @@
 import React from "react";
-import { AppBar, Toolbar, Typography } from "@material-ui/core";
+import { AppBar, Toolbar, Typography } from "@mui/material";
 
 function Header() {
   return (
-    <AppBar position="static">
+    <AppBar position="static" className="header">
       <Toolbar>
         <Typography variant="h6">Mi Aplicación</Typography>
       </Toolbar>
