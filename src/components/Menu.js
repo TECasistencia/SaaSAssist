@@ -1,9 +1,9 @@
 import React from "react";
-import { Drawer, List, ListItem, ListItemText } from "@material-ui/core";
+import { Drawer, List, ListItem, ListItemText } from "@mui/material";
 
 function Menu() {
   return (
-    <Drawer variant="permanent" anchor="right">
+    <Drawer variant="permanent" anchor="right" className="menu">
       <List>
         <ListItem button>
           <ListItemText primary="Opción 1" />
