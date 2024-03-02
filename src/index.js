@@ -2,12 +2,12 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import "./index.css";
 import reportWebVitals from "./reportWebVitals";
-import Page_inicio from "./components/Page_inicio";
+import PageInicio from "./components/PageInicio";
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
   <React.StrictMode>
-    <Page_inicio />
+    <PageInicio />
   </React.StrictMode>
 );
 
