@@ -6,7 +6,7 @@ function Footer() {
   return (
     <div className="footer">
       <AppBar position="static" color="primary">
-        <Toolbar>
+        <Toolbar style={{ justifyContent: "center" }}>
           <Typography variant="body1" color="inherit">
             Derechos de autor © 2024
           </Typography>
