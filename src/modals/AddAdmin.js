@@ -1,4 +1,4 @@
-import { Box, Button, Dialog, DialogActions, DialogTitle, TextField } from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 import React, { useState } from "react";
 
 const AddAdmin = ({ handleCloseAdd }) => {
@@ -36,7 +36,7 @@ const AddAdmin = ({ handleCloseAdd }) => {
       <Box
         component="form"
         sx={{
-          "& .MuiTextField-root": { m: 1, width:'20rem' },
+          "& .MuiTextField-root": { m: 1, width: "20rem" },
         }}
         noValidate
         autoComplete="off"
