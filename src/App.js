@@ -3,6 +3,7 @@ import "./App.css";
 import Login from "./components/Login";
 import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AdminTable from "./components/AdminTable";
+import PageInicio from "./components/PageInicio";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -11,6 +12,10 @@ const router = createBrowserRouter([
   {
     path: "/Admins",
     element: <AdminTable />,
+  },
+  {
+    path: "/Inicio",
+    element: <PageInicio />,
   },
   // {
   //   path: "/home-page",
