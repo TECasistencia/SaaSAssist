@@ -47,7 +47,7 @@ const Login = () => {
             label="Password"
           />
         </FormControl>
-        <Link to={"/Admins"}>
+        <Link to={"/Inicio"}>
           <Button sx={{ width: "100%" }} variant="outlined">
             Iniciar Sesión
           </Button>
