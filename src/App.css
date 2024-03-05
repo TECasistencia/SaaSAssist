@@ -14,6 +14,16 @@
   margin: 0 0 0 0;
 }
 
+.container-modal{
+  text-align: center;
+  padding-top: -5rem;
+  width: 100%;
+}
+.button-container {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 20px;
+}
 
 .container-login{
   margin: 10px;
