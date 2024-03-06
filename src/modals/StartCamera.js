@@ -9,7 +9,7 @@ import {
   Link,
 } from "@mui/material";
 
-function StartCamera({ handleClose, cameraTitle, onStart }) {
+function StartCamera({ handleClose, cameraTitle }) {
   const [selectedOption, setSelectedOption] = useState("");
 
   const handleOptionChange = (event) => {
@@ -40,19 +40,6 @@ function StartCamera({ handleClose, cameraTitle, onStart }) {
             </TextField>
           </FormControl>
           <br />
-          <div className="button-container">
-            <Button sx={{ mt: 2 }} onClick={onStart}>
-              <Link
-                to="/Admins"
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                Iniciar
-              </Link>
-            </Button>
-            <Button sx={{ mt: 2 }} color="error" onClick={handleClose}>
-              Cancelar
-            </Button>
-          </div>
         </div>
       </Box>
     </div>

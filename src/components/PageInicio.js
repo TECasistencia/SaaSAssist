@@ -5,7 +5,8 @@ import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import CameraCard from "./CameraCard";
 import StartCamera from "../modals/StartCamera";
-import { Dialog, DialogContent } from "@mui/material";
+import { Button, Dialog, DialogActions, DialogContent } from "@mui/material";
+import { Link } from "react-router-dom";
 
 const initialCameras = [
   { title: "Título de la cámara 1", estado: "Offline" },
@@ -80,6 +81,19 @@ function PageInicio() {
             onStart={handleStart}
           />
         </DialogContent>
+        <DialogActions>
+          <div className="button-container">
+            <Link to={"/ViewCamera"}>
+              <Button sx={{ mt: 2 }} onClick={handleStart}>
+                Iniciar
+              </Button>
+            </Link>
+
+            <Button sx={{ mt: 2 }} color="error" onClick={handleClose}>
+              Cancelar
+            </Button>
+          </div>
+        </DialogActions>
       </Dialog>
     </div>
   );
