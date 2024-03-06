@@ -1,12 +1,12 @@
 import { Box, Button, TextField } from "@mui/material";
 import React, { useState } from "react";
 
-const AddAdmin = ({ handleCloseAdd }) => {
-  const [id, setid] = useState();
-  const [Name, setName] = useState();
-  const [LastName, setLastName] = useState();
-  const [Mail, setMail] = useState();
-  const [Images, setImages] = useState();
+const ModalAdmin = ({ isEdit, admin, handleClose }) => {
+  const [id, setid] = useState(isEdit ? admin.id : "");
+  const [Name, setName] = useState(isEdit ? admin.nombre : "");
+  const [LastName, setLastName] = useState(isEdit ? admin.apellidos : "");
+  const [Mail, setMail] = useState(isEdit ? admin.correo : "");
+  const [Images, setImages] = useState(isEdit ? admin.imagenes : "");
 
   const handleChangeId = (e) => {
     const inputValue = e.target.value;
@@ -31,7 +31,7 @@ const AddAdmin = ({ handleCloseAdd }) => {
 
   return (
     <div className="container-modal">
-      <h2>Agregar un administrador</h2>
+      <h2>{isEdit ? "Editar administrador" : "Agregar un administrador"}</h2>
 
       <Box
         component="form"
@@ -76,8 +76,8 @@ const AddAdmin = ({ handleCloseAdd }) => {
 
           <br />
           <div className="button-container">
-            <Button sx={{ mt: 2 }}>Agregar</Button>
-            <Button sx={{ mt: 2 }} color="error" onClick={handleCloseAdd}>
+            <Button sx={{ mt: 2 }}>Editar</Button>
+            <Button sx={{ mt: 2 }} color="error" onClick={handleClose}>
               Cancelar
             </Button>
           </div>
@@ -87,4 +87,4 @@ const AddAdmin = ({ handleCloseAdd }) => {
   );
 };
 
-export default AddAdmin;
+export default ModalAdmin;

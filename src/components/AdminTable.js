@@ -19,9 +19,8 @@ import React, { useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import AddAdmin from "../modals/AddAdmin";
-import EditAdmin from "../modals/EditAdmin";
 import Header from "./Header";
+import ModalAdmin from "../modals/ModalAdmin";
 
 const AdminTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -202,7 +201,11 @@ const AdminTable = () => {
         <Dialog TransitionProps={{ onEntering: handleEntering }} open={openAdd}>
           {/* <DialogTitle>Phone Ringtone</DialogTitle> */}
           <DialogContent>
-            <AddAdmin handleCloseAdd={handleCloseAdd} />
+            <ModalAdmin
+              isEdit={false}
+              admin={null}
+              handleClose={handleCloseAdd}
+            />
           </DialogContent>
         </Dialog>
 
@@ -211,7 +214,11 @@ const AdminTable = () => {
           open={openEdit}
         >
           <DialogContent>
-            <EditAdmin admin={adminEdit} handleClose={handleCloseEdit} />
+            <ModalAdmin
+              isEdit={true}
+              admin={adminEdit}
+              handleClose={handleCloseEdit}
+            />
           </DialogContent>
         </Dialog>
 
