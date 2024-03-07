@@ -22,7 +22,6 @@ import AddCircleIcon from "@mui/icons-material/AddCircle";
 import AddAdmin from "../modals/AddAdmin";
 import EditAdmin from "../modals/EditAdmin";
 import Header from "./Header";
-import Footer from "./Footer";
 
 const AdminTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -233,7 +232,6 @@ const AdminTable = () => {
           </DialogActions>
         </Dialog>
       </div>
-      <Footer />
     </>
   );
 };
