@@ -1,15 +1,13 @@
 import React, { useState } from "react";
 import {
-  Button,
   Box,
   MenuItem,
   FormControl,
   Typography,
   TextField,
-  Link,
 } from "@mui/material";
 
-function StartCamera({ handleClose, cameraTitle }) {
+function StartCamera({ cameraTitle }) {
   const [selectedOption, setSelectedOption] = useState("");
 
   const handleOptionChange = (event) => {
