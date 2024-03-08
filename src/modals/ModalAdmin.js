@@ -3,10 +3,10 @@ import React, { useState } from "react";
 
 const ModalAdmin = ({ isEdit, admin, handleClose }) => {
   const [id, setid] = useState(isEdit ? admin.id : "");
-  const [Name, setName] = useState(isEdit ? admin.nombre : "");
-  const [LastName, setLastName] = useState(isEdit ? admin.apellidos : "");
-  const [Mail, setMail] = useState(isEdit ? admin.correo : "");
-  const [Images, setImages] = useState(isEdit ? admin.imagenes : "");
+  const [Name, setName] = useState(isEdit ? admin.name : "");
+  const [LastName, setLastName] = useState(isEdit ? admin.lastName : "");
+  const [Mail, setMail] = useState(isEdit ? admin.mail : "");
+  const [Images, setImages] = useState(isEdit ? admin.images : "");
 
   const handleChangeId = (e) => {
     const inputValue = e.target.value;
