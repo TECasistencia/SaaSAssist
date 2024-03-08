@@ -35,45 +35,45 @@ const AdminTable = () => {
   const Admins = [
     {
       id: "1",
-      nombre: "Juan",
-      apellidos: "Perez Chavarria",
-      correo: "juanp@asrt.com",
-      imagenes: "img1, img2",
+      name: "Juan",
+      lastName: "Perez Chavarria",
+      mail: "juanp@asrt.com",
+      images: "img1, img2",
     },
     {
       id: "2",
-      nombre: "Luis",
-      apellidos: "Castillo",
-      correo: "luisc@ast.com",
-      imagenes: "img1, img 2",
+      name: "Luis",
+      lastName: "Castillo",
+      mail: "luisc@ast.com",
+      images: "img1, img2",
     },
     {
       id: "3",
-      nombre: "Alison",
-      apellidos: "Gonzalez Jara",
-      correo: "luisc@ast.com",
-      imagenes: "img1, img 2",
+      name: "Alison",
+      lastName: "Gonzalez Jara",
+      mail: "luisc@ast.com",
+      images: "img1, img2",
     },
     {
       id: "4",
-      nombre: "Guillermo",
-      apellidos: "Perez Chavarria",
-      correo: "juanp@asrt.com",
-      imagenes: "img1, img2",
+      name: "Guillermo",
+      lastName: "Perez Chavarria",
+      mail: "juanp@asrt.com",
+      images: "img1, img2",
     },
     {
       id: "5",
-      nombre: "Emiliano",
-      apellidos: "Castillo",
-      correo: "luisc@ast.com",
-      imagenes: "img1, img 2",
+      name: "Emiliano",
+      lastName: "Castillo",
+      mail: "luisc@ast.com",
+      images: "img1, img2",
     },
     {
       id: "6",
-      nombre: "Adonis",
-      apellidos: "Gonzalez Jara",
-      correo: "luisc@ast.com",
-      imagenes: "img1, img 2",
+      name: "Adonis",
+      lastName: "Gonzalez Jara",
+      mail: "luisc@ast.com",
+      images: "img1, img2",
     },
   ];
 
@@ -119,7 +119,7 @@ const AdminTable = () => {
     <>
       <Header />
       <div className="container">
-        <h2>Administradores</h2>
+        <h2>Administradores (Profesores)</h2>
         <div style={{ width: "70rem" }}>
           <Tooltip title="Agregar" placement="top">
             <IconButton onClick={handleOpenAdd} aria-label="add">
@@ -155,10 +155,10 @@ const AdminTable = () => {
                   <TableCell component="th" scope="row">
                     {admin.id}
                   </TableCell>
-                  <TableCell align="left">{admin.nombre}</TableCell>
-                  <TableCell align="left">{admin.apellidos}</TableCell>
-                  <TableCell align="left">{admin.correo}</TableCell>
-                  <TableCell align="left">{admin.imagenes}</TableCell>
+                  <TableCell align="left">{admin.name}</TableCell>
+                  <TableCell align="left">{admin.lastName}</TableCell>
+                  <TableCell align="left">{admin.mail}</TableCell>
+                  <TableCell align="left">{admin.images}</TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">
                       <Tooltip title="Eliminar" placement="top">
