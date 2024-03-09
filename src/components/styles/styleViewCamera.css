@@ -1,0 +1,47 @@
+.video-container {
+  position: relative;
+  height: 100vh;
+}
+
+.video {
+  width: 100%;
+  height: auto;
+  max-height: 100%;
+}
+
+.chart-canvas {
+  position: absolute;
+  top: 20px; /* Ajusta la posición vertical según sea necesario */
+  right: 20px; /* Ajusta la posición horizontal según sea necesario */
+  background-color: #4d4d4d; /* Fondo gris */
+  padding: 10px; /* Espacio alrededor de la gráfica */
+  border-radius: 5px; /* Bordes redondeados */
+  z-index: 1; /* Asegúrate de que la gráfica esté encima del video */
+}
+
+.menu-container {
+  position: absolute;
+  top: 10px; /* Ajusta la posición vertical según sea necesario */
+  left: 10px; /* Ajusta la posición horizontal según sea necesario */
+}
+
+.menu-dropdown {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Distribuir los elementos de manera uniforme */
+  align-items: center; /* Alinear los elementos a la izquierda */
+  width: max-content;
+  background-color: #ccc;
+  border: 1px solid #ccc;
+  padding: 5px;
+  z-index: 1;
+}
+
+.checkbox-container label {
+  margin-right: 10px; /* Ajusta el margen derecho según sea necesario */
+}
+
+.hidden {
+  display: none;
+}
