@@ -1,6 +1,6 @@
 import React from "react";
 import { AppBar, Toolbar, Typography } from "@mui/material";
-import "./styles/styleInicio.css";
+import "../styles/styleInicio.css";
 
 function Footer() {
   return (

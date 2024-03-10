@@ -1,0 +1,8 @@
+/* styles.css */
+.checkbox-root {
+  color: #1976d2; /* Establecer el color azul por defecto */
+}
+
+.checkbox-input {
+  pointer-events: none; /* Deshabilitar la interacción del usuario */
+}
