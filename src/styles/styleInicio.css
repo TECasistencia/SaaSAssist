@@ -1,0 +1,47 @@
+.MuiPaper-root.MuiPaper-elevation.MuiPaper-rounded.MuiPaper-elevation1.MuiCard-root.css-bhp9pd-MuiPaper-root-MuiCard-root {
+  border-radius: 5%;
+  background: #86a6cf;
+  width: max-content;
+  height: max-content;
+}
+
+.cameraContent {
+  display: flex;
+  flex-direction: column;
+  background: #51719a;
+  color: #ffffff;
+  justify-content: space-between;
+  align-items: center;
+
+  transition: transform 0.3s ease;
+}
+
+.cameraContent:hover {
+  transform: translateY(-5px);
+}
+
+.title {
+  margin-top: 10px;
+}
+
+.statusText.Offline {
+  color: black;
+}
+
+.statusText.Online {
+  color: white;
+}
+
+.iconContainer {
+  font-size: 70px;
+}
+
+.box {
+  min-height: 100vh;
+  margin-top: 20px;
+  margin-left: 20px;
+}
+
+.menuIcon {
+  color: white;
+}
