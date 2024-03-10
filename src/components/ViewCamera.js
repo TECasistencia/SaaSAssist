@@ -3,7 +3,7 @@ import Header from "./Header";
 import Footer from "./Footer";
 import "../styles/styleViewCamera.css";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
-import videoSource from "../media/IA_Video.mp4";
+import videoSource from "../media/Facial.mp4";
 import ViewListAssist from "../modals/ViewListAssist";
 import {
   Button,
