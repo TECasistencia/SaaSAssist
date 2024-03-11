@@ -8,6 +8,9 @@ import ViewCamera from "./components/ViewCamera";
 import ViewDataHistoryClass from "./components/ViewDataHistoryClass";
 import ViewDataHistoryDate from "./components/ViewDataHistoryDate";
 import ViewDataHistoryAG from "./components/ViewDataHistoryAG";
+import GuestTable from "./components/GuestTable";
+import UserTable from "./components/UserTable";
+
 const router = createBrowserRouter([
   {
     path: "/",
@@ -16,6 +19,14 @@ const router = createBrowserRouter([
   {
     path: "/Admins",
     element: <AdminTable />,
+  },
+  {
+    path: "/Guests",
+    element: <GuestTable />,
+  },
+  {
+    path: "/Users",
+    element: <UserTable />,
   },
   {
     path: "/Inicio",

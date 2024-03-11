@@ -1,87 +1,84 @@
 import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Paper,
+  IconButton,
   Table,
   TableBody,
   TableCell,
-  TableHead,
-  TableRow,
-  Paper,
-  Tooltip,
-  IconButton,
-  TablePagination,
   TableContainer,
-  Dialog,
-  DialogContent,
-  DialogTitle,
-  DialogActions,
-  Button,
+  TableHead,
+  TablePagination,
+  TableRow,
+  Tooltip,
 } from "@mui/material";
 import React, { useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
-import VisibilityIcon from "@mui/icons-material/Visibility";
-
 import Header from "./Header";
-import ModalAdmin from "../modals/ModalAdmin";
-import Footer from "./Footer";
+import ModalGuest from "../modals/ModalGuest";
 
-const AdminTable = () => {
+const GuestTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [openDelete, setOpenDelete] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [adminEdit, setAdminEdit] = useState();
+  const [guestEdit, setGuestEdit] = useState();
 
   const dialogRef = React.useRef(null);
 
-  const Admins = [
+  const Guests = [
     {
       id: "1",
-      name: "Juan",
+      name: "Hugo",
       lastName: "Perez Chavarria",
-      mail: "juanp@asrt.com",
-      images: "img1, img2",
+      mail: "hugo@asrt.com",
+      pass: "123",
     },
     {
       id: "2",
-      name: "Luis",
+      name: "Fernando",
       lastName: "Castillo",
-      mail: "luisc@ast.com",
-      images: "img1, img2",
+      mail: "fercas@ast.com",
+      pass: "adr",
     },
     {
       id: "3",
-      name: "Alison",
+      name: "Adriana",
       lastName: "Gonzalez Jara",
-      mail: "luisc@ast.com",
-      images: "img1, img2",
+      mail: "adri@ast.com",
+      pass: "esd",
     },
     {
       id: "4",
-      name: "Guillermo",
+      name: "Rodrigo",
       lastName: "Perez Chavarria",
-      mail: "juanp@asrt.com",
-      images: "img1, img2",
+      mail: "rod@asrt.com",
+      pass: "rer",
     },
     {
       id: "5",
-      name: "Emiliano",
+      name: "Carlos",
       lastName: "Castillo",
-      mail: "luisc@ast.com",
-      images: "img1, img2",
+      mail: "carlos@ast.com",
+      pass: "wer",
     },
     {
       id: "6",
-      name: "Adonis",
+      name: "Samanta",
       lastName: "Gonzalez Jara",
-      mail: "luisc@ast.com",
-      images: "img1, img2",
+      mail: "samgon@ast.com",
+      pass: "rte",
     },
   ];
 
-  const handleOpenEdit = (admin) => {
-    setAdminEdit(admin);
+  const handleOpenEdit = (guest) => {
+    setGuestEdit(guest);
     setOpenEdit(true);
   };
   const handleCloseEdit = () => {
@@ -109,8 +106,8 @@ const AdminTable = () => {
     }
   };
 
-  const handleClickOpenDelete = (admin) => {
-    // logica para eliminar el admin seleccionado
+  const handleClickOpenDelete = (guest) => {
+    // logica para eliminar el guest seleccionado
     setOpenDelete(true);
   };
 
@@ -122,7 +119,7 @@ const AdminTable = () => {
     <>
       <Header />
       <div className="container">
-        <h2>Administradores (Profesores)</h2>
+        <h2>Invitados (Padres)</h2>
         <div style={{ width: "70rem" }}>
           <Tooltip title="Agregar" placement="top">
             <IconButton onClick={handleOpenAdd} aria-label="add">
@@ -139,42 +136,36 @@ const AdminTable = () => {
                 <TableCell align="left">Nombre</TableCell>
                 <TableCell align="left">Apellidos</TableCell>
                 <TableCell align="left">Correo</TableCell>
-                <TableCell align="left">Imagenes</TableCell>
+                <TableCell align="left">Contraseña</TableCell>
                 <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {(rowsPerPage > 0
-                ? Admins.slice(
+                ? Guests.slice(
                     page * rowsPerPage,
                     page * rowsPerPage + rowsPerPage
                   )
-                : Admins
-              ).map((admin) => (
+                : Guests
+              ).map((guest) => (
                 <TableRow
-                  key={admin.id}
+                  key={guest.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {admin.id}
+                    {guest.id}
                   </TableCell>
-                  <TableCell align="left">{admin.name}</TableCell>
-                  <TableCell align="left">{admin.lastName}</TableCell>
-                  <TableCell align="left">{admin.mail}</TableCell>
-                  <TableCell sx={{ paddingLeft: 3 }} align="left">
-                    <Tooltip title="Ver imágenes" placement="top">
-                      <IconButton color="info" aria-label="ver">
-                        <VisibilityIcon />
-                      </IconButton>
-                    </Tooltip>
-                  </TableCell>
+                  <TableCell align="left">{guest.name}</TableCell>
+                  <TableCell align="left">{guest.lastName}</TableCell>
+                  <TableCell align="left">{guest.mail}</TableCell>
+                  <TableCell align="left">{guest.pass}</TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">
                       <Tooltip title="Eliminar" placement="top">
                         <IconButton
                           color="error"
                           aria-label="delete"
-                          onClick={() => handleClickOpenDelete(admin)}
+                          onClick={() => handleClickOpenDelete(guest)}
                         >
                           <DeleteIcon />
                         </IconButton>
@@ -185,7 +176,7 @@ const AdminTable = () => {
                         <IconButton
                           color="success"
                           aria-label="edit"
-                          onClick={() => handleOpenEdit(admin)}
+                          onClick={() => handleOpenEdit(guest)}
                         >
                           <EditIcon />
                         </IconButton>
@@ -201,18 +192,17 @@ const AdminTable = () => {
           sx={{ width: "70rem" }}
           component="div"
           rowsPerPageOptions={[5, 10, 25]}
-          count={Admins.length}
+          count={Guests.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
         <Dialog TransitionProps={{ onEntering: handleEntering }} open={openAdd}>
-          {/* <DialogTitle>Phone Ringtone</DialogTitle> */}
           <DialogContent>
-            <ModalAdmin
+            <ModalGuest
               isEdit={false}
-              admin={null}
+              guest={null}
               handleClose={handleCloseAdd}
             />
           </DialogContent>
@@ -223,9 +213,9 @@ const AdminTable = () => {
           open={openEdit}
         >
           <DialogContent>
-            <ModalAdmin
+            <ModalGuest
               isEdit={true}
-              admin={adminEdit}
+              guest={guestEdit}
               handleClose={handleCloseEdit}
             />
           </DialogContent>
@@ -238,7 +228,7 @@ const AdminTable = () => {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">
-            {"¿Está seguro que desea eliminar el admin?"}
+            {"¿Está seguro que desea eliminar el invitado?"}
           </DialogTitle>
           <DialogActions>
             <Button color="success">Aceptar</Button>
@@ -248,9 +238,8 @@ const AdminTable = () => {
           </DialogActions>
         </Dialog>
       </div>
-      <Footer />
     </>
   );
 };
 
-export default AdminTable;
+export default GuestTable;
