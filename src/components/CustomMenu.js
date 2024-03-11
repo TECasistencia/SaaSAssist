@@ -56,8 +56,31 @@ function CustomMenu() {
             Administradores
           </Link>
         </MenuItem>
+        <MenuItem onClick={handleClose}>
+          <Link
+            to="/Guests"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            Invitados
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleClose}>
+          <Link
+            to="/Users"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            Usuarios
+          </Link>
+        </MenuItem>
 
-        <MenuItem onClick={handleClose}>Logout</MenuItem>
+        <MenuItem onClick={handleClose}>
+          <Link
+            to="/"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            Log out
+          </Link>
+        </MenuItem>
       </Menu>
     </div>
   );

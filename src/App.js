@@ -5,6 +5,8 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AdminTable from "./components/AdminTable";
 import PageInicio from "./components/PageInicio";
 import ViewCamera from "./components/ViewCamera";
+import GuestTable from "./components/GuestTable";
+import UserTable from "./components/UserTable";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -13,6 +15,14 @@ const router = createBrowserRouter([
   {
     path: "/Admins",
     element: <AdminTable />,
+  },
+  {
+    path: "/Guests",
+    element: <GuestTable />,
+  },
+  {
+    path: "/Users",
+    element: <UserTable />,
   },
   {
     path: "/Inicio",

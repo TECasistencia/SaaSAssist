@@ -1,12 +1,12 @@
 import { Box, Button, TextField } from "@mui/material";
 import React, { useState } from "react";
 
-const AddAdmin = ({ handleCloseAdd }) => {
-  const [id, setid] = useState();
-  const [Name, setName] = useState();
-  const [LastName, setLastName] = useState();
-  const [Mail, setMail] = useState();
-  const [Images, setImages] = useState();
+const ModalGuest = ({ isEdit, guest, handleClose }) => {
+  const [id, setid] = useState(isEdit ? guest.id : "");
+  const [Name, setName] = useState(isEdit ? guest.name : "");
+  const [LastName, setLastName] = useState(isEdit ? guest.lastName : "");
+  const [Mail, setMail] = useState(isEdit ? guest.mail : "");
+  const [Pass, setPass] = useState(isEdit ? guest.pass : "");
 
   const handleChangeId = (e) => {
     const inputValue = e.target.value;
@@ -24,14 +24,14 @@ const AddAdmin = ({ handleCloseAdd }) => {
     const inputValue = e.target.value;
     setMail(inputValue);
   };
-  const handleChangeImages = (e) => {
+  const handleChangePass = (e) => {
     const inputValue = e.target.value;
-    setImages(inputValue);
+    setPass(inputValue);
   };
 
   return (
     <div className="container-modal">
-      <h2>Agregar un administrador</h2>
+      <h2>{isEdit ? "Editar invitado" : "Agregar un invitado"}</h2>
 
       <Box
         component="form"
@@ -47,7 +47,7 @@ const AddAdmin = ({ handleCloseAdd }) => {
             label="ID"
             value={id}
             onChange={handleChangeId}
-            disabled
+            disabled={isEdit}
           />
           <TextField
             id="outlined"
@@ -69,15 +69,15 @@ const AddAdmin = ({ handleCloseAdd }) => {
           />
           <TextField
             id="outlined"
-            label="Imágenes"
-            value={Images}
-            onChange={handleChangeImages}
+            label="Contraseña"
+            value={Pass}
+            onChange={handleChangePass}
           />
 
           <br />
           <div className="button-container">
-            <Button sx={{ mt: 2 }}>Agregar</Button>
-            <Button sx={{ mt: 2 }} color="error" onClick={handleCloseAdd}>
+            <Button sx={{ mt: 2 }}>Editar</Button>
+            <Button sx={{ mt: 2 }} color="error" onClick={handleClose}>
               Cancelar
             </Button>
           </div>
@@ -87,4 +87,4 @@ const AddAdmin = ({ handleCloseAdd }) => {
   );
 };
 
-export default AddAdmin;
+export default ModalGuest;
