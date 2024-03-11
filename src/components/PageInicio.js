@@ -70,7 +70,6 @@ function PageInicio() {
           ))}
         </Grid>
       </Box>
-      <Footer />
 
       <Dialog open={isModalOpen}>
         <DialogContent>
@@ -94,6 +93,7 @@ function PageInicio() {
           </div>
         </DialogActions>
       </Dialog>
+      <Footer />
     </div>
   );
 }
