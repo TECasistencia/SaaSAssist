@@ -56,7 +56,14 @@ function CustomMenu() {
             Administradores
           </Link>
         </MenuItem>
-
+        <MenuItem onClick={handleClose}>
+          <Link
+            to="/ViewDataHistoryClass"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            Historial de datos
+          </Link>
+        </MenuItem>
         <MenuItem onClick={handleClose}>Logout</MenuItem>
       </Menu>
     </div>
