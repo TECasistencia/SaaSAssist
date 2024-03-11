@@ -19,6 +19,8 @@ import React, { useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+
 import Header from "./Header";
 import ModalUser from "../modals/ModalUser";
 
@@ -127,7 +129,7 @@ const UserTable = () => {
       <Header />
       <div className="container">
         <h2>Usuarios (Alumnos)</h2>
-        <div style={{ width: "70rem" }}>
+        <div style={{ width: "80rem" }}>
           <Tooltip title="Agregar" placement="top">
             <IconButton onClick={handleOpenAdd} aria-label="add">
               <AddCircleIcon fontSize="large" color="primary" />
@@ -166,7 +168,14 @@ const UserTable = () => {
                   <TableCell align="left">{user.name}</TableCell>
                   <TableCell align="left">{user.lastName}</TableCell>
                   <TableCell align="left">{user.mail}</TableCell>
-                  <TableCell align="left">{user.images}</TableCell>
+                  <TableCell sx={{ paddingLeft: 3 }} align="left">
+                    <Tooltip title="Ver imágenes" placement="top">
+                      <IconButton color="info" aria-label="ver">
+                        {/* se mostraría el enlace donde se tienen las imagenes */}
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
                   <TableCell align="left">{user.idGuest}</TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">
