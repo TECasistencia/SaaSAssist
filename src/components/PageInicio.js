@@ -76,6 +76,7 @@ function PageInicio() {
           <StartCamera
             handleClose={handleClose}
             cameraTitle={selectedCameraTitle}
+            professorName={"Jorge Velazco"}
             onStart={handleStart}
           />
         </DialogContent>
