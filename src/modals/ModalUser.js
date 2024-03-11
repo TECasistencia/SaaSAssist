@@ -1,4 +1,7 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, Dialog, DialogActions, DialogContent, IconButton, TextField, Tooltip } from "@mui/material";
+import CloudUploadIcon from "@mui/icons-material/CloudUpload";
+import DescriptionIcon from "@mui/icons-material/Description";
+import DeleteIcon from "@mui/icons-material/Delete";
 import React, { useState } from "react";
 
 const ModalUser = ({ isEdit, user, handleClose }) => {
@@ -6,8 +9,29 @@ const ModalUser = ({ isEdit, user, handleClose }) => {
   const [Name, setName] = useState(isEdit ? user.name : "");
   const [LastName, setLastName] = useState(isEdit ? user.lastName : "");
   const [Mail, setMail] = useState(isEdit ? user.mail : "");
-  const [Images, setImages] = useState(isEdit ? user.images : "");
   const [IdGuest, setIdGuest] = useState(isEdit ? user.idGuest : "");
+  const [Images, setImages] = useState(null);
+  const dialogRef = React.useRef(null);
+
+  const [openSubirImages, setOpenSubirImages] = useState(false);
+  const [urlImages, setUrlImages] = useState("");
+  const [fileNameImages, setFileNameImages] = useState(
+    "No hay archivo seleccionado"
+  );
+  const handleOpenSubirImages = () => {
+    setOpenSubirImages(true);
+  };
+  const handleCloseSubirImages = () => {
+    setOpenSubirImages(false);
+    setImages(null);
+    setFileNameImages("No hay archivo seleccionado");
+  };
+
+  const handleEntering = () => {
+    if (dialogRef.current != null) {
+      dialogRef.current.focus();
+    }
+  };
 
   const handleChangeId = (e) => {
     const inputValue = e.target.value;
@@ -74,16 +98,27 @@ const ModalUser = ({ isEdit, user, handleClose }) => {
           />
           <TextField
             id="outlined"
-            label="Imágenes"
-            value={Images}
-            onChange={handleChangeImages}
-          />
-          <TextField
-            id="outlined"
             label="id invitado (Padre)"
             value={IdGuest}
             onChange={handleChangeIdGuest}
           />
+          <div className="logo-pagina">
+            <h3>Imagenes del sujeto</h3>
+            <div className="logo-box">
+              <img
+                style={{ maxWidth: "500px", borderRadius: "5px" }}
+                src={urlImages !== "" ? urlImages : ""}
+                alt=""
+              />
+            </div>
+            <Button
+              variant="outlined"
+              sx={{ mt: "1rem", width: "10rem" }}
+              onClick={handleOpenSubirImages}
+            >
+              Subir Imagenes
+            </Button>
+          </div>
 
           <br />
           <div className="button-container">
@@ -94,6 +129,74 @@ const ModalUser = ({ isEdit, user, handleClose }) => {
           </div>
         </div>
       </Box>
+      <Dialog
+        TransitionProps={{ onEntering: handleEntering }}
+        open={openSubirImages}
+      >
+        <DialogContent>
+          <div className="logo-pagina">
+            <h3>Imágenes a subir</h3>
+            <form
+              className="form-logo"
+              action=""
+              onClick={() => document.querySelector(".input-logo").click()}
+            >
+              <input
+                className="input-logo"
+                type="file"
+                accept="image/*"
+                hidden
+                onClick={(event) => {
+                  event.target.value = null;
+                }}
+                onChange={({ target: { files } }) => {
+                  files[0] && setFileNameImages(files[0].name);
+                  if (files) {
+                    setImages(files[0]);
+                  }
+                }}
+              />
+              {Images ? (
+                <img
+                  style={{ maxWidth: "500px", borderRadius: "5px" }}
+                  src={URL.createObjectURL(Images)}
+                  alt={fileNameImages}
+                />
+              ) : (
+                <>
+                  <CloudUploadIcon
+                    color="primary"
+                    sx={{ width: 40, height: 40 }}
+                  />
+                  <p>Subir un archivo</p>
+                </>
+              )}
+            </form>
+            <section className="uploaded-row">
+              <DescriptionIcon color="primary" />
+              <span>{fileNameImages}</span>
+              <IconButton
+                color="error"
+                aria-label="delete"
+                onClick={() => {
+                  setFileNameImages("No hay archivo seleccionado");
+                  setImages(null);
+                }}
+              >
+                <Tooltip title="Eliminar erchivo seleccionado" placement="top">
+                  <DeleteIcon />
+                </Tooltip>
+              </IconButton>
+            </section>
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button color="success">Guardar Imágenes</Button>
+          <Button color="error" onClick={handleCloseSubirImages} autoFocus>
+            Cancelar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </div>
   );
 };
