@@ -5,6 +5,9 @@ import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AdminTable from "./components/AdminTable";
 import PageInicio from "./components/PageInicio";
 import ViewCamera from "./components/ViewCamera";
+import ViewDataHistoryClass from "./components/ViewDataHistoryClass";
+import ViewDataHistoryDate from "./components/ViewDataHistoryDate";
+import ViewDataHistoryAG from "./components/ViewDataHistoryAG";
 const router = createBrowserRouter([
   {
     path: "/",
@@ -21,6 +24,18 @@ const router = createBrowserRouter([
   {
     path: "/ViewCamera",
     element: <ViewCamera />,
+  },
+  {
+    path: "/ViewDataHistoryClass",
+    element: <ViewDataHistoryClass />,
+  },
+  {
+    path: "/ViewDataHistoryDate/:id",
+    element: <ViewDataHistoryDate />,
+  },
+  {
+    path: "/ViewDataHistoryAG/:id",
+    element: <ViewDataHistoryAG />,
   },
   // {
   //   path: "/home-page",
