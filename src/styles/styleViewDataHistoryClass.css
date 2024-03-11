@@ -1,0 +1,58 @@
+.search-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 1.5rem;
+  height: 5rem;
+}
+
+.search-input {
+  width: 30rem;
+}
+
+.search-button {
+  height: 3.5rem; /* Establece la misma altura que el input */
+  width: 7rem;
+}
+
+.header-text {
+  text-align: center;
+  height: max-content;
+}
+
+.button-link {
+  text-decoration: none;
+}
+
+.list-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.list-item {
+  margin-bottom: 1rem;
+}
+
+/* Estilos para el botón */
+.button-link .MuiButton-root {
+  width: 100vh; /* Ancho del 60% de la pantalla */
+  background-color: #1a1a37; /* Color de fondo gris */
+  color: #fff; /* Color del texto */
+}
+
+.button-link .MuiButton-root:hover {
+  background-color: #999; /* Cambio de color al pasar el ratón */
+}
+
+.contentClass {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.contentInternClass {
+  flex: 1;
+}

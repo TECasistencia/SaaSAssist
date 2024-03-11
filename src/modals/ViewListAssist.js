@@ -37,20 +37,25 @@ function ViewListAssist() {
   };
 
   return (
-    <TableContainer component={Paper}>
-      <Table>
+    <TableContainer sx={{ width: "35rem" }} component={Paper}>
+      <Table sx={{ width: "35rem" }} aria-label="simple table">
         <TableHead>
           <TableRow>
             <TableCell>Nombre del Alumno</TableCell>
-            <TableCell>Presente</TableCell>
-            <TableCell>Tardía</TableCell>
+            <TableCell align="left">Presente</TableCell>
+            <TableCell align="right">Tardía</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
           {students.map((student) => (
-            <TableRow key={student.id}>
-              <TableCell>{student.name}</TableCell>
-              <TableCell>
+            <TableRow
+              key={student.id}
+              sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
+            >
+              <TableCell component="th" scope="row">
+                {student.name}
+              </TableCell>
+              <TableCell align="left">
                 <Checkbox
                   checked={student.present}
                   onChange={() => handlePresenceChange(student.id)}
@@ -61,7 +66,7 @@ function ViewListAssist() {
                   inputProps={{ "aria-label": "controlled" }}
                 />
               </TableCell>
-              <TableCell>
+              <TableCell align="right">
                 <Checkbox
                   checked={student.late}
                   onChange={() => handleLateChange(student.id)}

@@ -58,6 +58,14 @@ function CustomMenu() {
         </MenuItem>
         <MenuItem onClick={handleClose}>
           <Link
+            to="/ViewDataHistoryClass"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            Historial de datos
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleClose}>
+          <Link
             to="/Guests"
             style={{ textDecoration: "none", color: "inherit" }}
           >
@@ -72,12 +80,8 @@ function CustomMenu() {
             Usuarios
           </Link>
         </MenuItem>
-
         <MenuItem onClick={handleClose}>
-          <Link
-            to="/"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
             Log out
           </Link>
         </MenuItem>

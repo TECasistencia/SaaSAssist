@@ -1,0 +1,42 @@
+.contentAG {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+.contentInternAG {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center; /* Alinear los elementos en el centro */
+  justify-content: space-around; /* Distribuir el espacio uniformemente */
+}
+
+.emotions-chart-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+.contentGrafic {
+  background-color: aliceblue;
+  border-top: 1px solid gray;
+  border-bottom: 1px solid gray;
+  height: 12rem;
+  width: 100%;
+}
+
+.contentGrafic h2 {
+  display: flex;
+  justify-content: center;
+}
+
+.assist h2 {
+  display: flex;
+  justify-content: center;
+}
+
+.informationDet {
+  display: grid;
+  grid-auto-flow: column;
+  gap: 10px; /* Ajusta el valor según el espacio deseado entre los elementos */
+}

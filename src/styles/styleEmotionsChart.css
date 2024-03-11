@@ -1,0 +1,25 @@
+/* Estilos para deshabilitar la edición de los sliders */
+.MuiSlider-root {
+  pointer-events: none;
+}
+
+/* Estilos para los sliders de emociones */
+.slider-Felicidad .MuiSlider-track {
+  background-color: green; /* Color para la emoción 'Feliz' */
+}
+
+.slider-Ira .MuiSlider-track {
+  background-color: red; /* Color para la emoción 'Ira' */
+}
+
+.slider-Tristeza .MuiSlider-track {
+  background-color: blue; /* Color para la emoción 'Tristeza' */
+}
+
+.slider-Miedo .MuiSlider-track {
+  background-color: orange; /* Color para la emoción 'Miedo' */
+}
+
+.slider-Sorpresa .MuiSlider-track {
+  background-color: purple; /* Color para la emoción 'Sorpresa' */
+}
