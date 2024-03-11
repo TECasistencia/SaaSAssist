@@ -13,6 +13,7 @@
   position: absolute;
   top: 10px; /* Ajusta la posición vertical según sea necesario */
   left: 10px; /* Ajusta la posición horizontal según sea necesario */
+  z-index: 1;
 }
 
 .menu-dropdown {
@@ -25,7 +26,6 @@
   background-color: #ccc;
   border: 1px solid #ccc;
   padding: 5px;
-  z-index: 1;
 }
 
 .checkbox-container label {
@@ -34,37 +34,4 @@
 
 .hidden {
   display: none;
-}
-
-.emotions-sliders {
-  width: 100px;
-  position: absolute;
-  top: 10px;
-  right: 30px;
-}
-
-/* Estilos para deshabilitar la edición de los sliders */
-.MuiSlider-root {
-  pointer-events: none;
-}
-
-/* Estilos para los sliders de emociones */
-.slider-Felicidad .MuiSlider-track {
-  background-color: green; /* Color para la emoción 'Feliz' */
-}
-
-.slider-Ira .MuiSlider-track {
-  background-color: red; /* Color para la emoción 'Ira' */
-}
-
-.slider-Tristeza .MuiSlider-track {
-  background-color: blue; /* Color para la emoción 'Tristeza' */
-}
-
-.slider-Miedo .MuiSlider-track {
-  background-color: orange; /* Color para la emoción 'Miedo' */
-}
-
-.slider-Sorpresa .MuiSlider-track {
-  background-color: purple; /* Color para la emoción 'Sorpresa' */
 }
