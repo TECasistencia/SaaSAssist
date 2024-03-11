@@ -23,6 +23,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 
 import Header from "./Header";
 import ModalAdmin from "../modals/ModalAdmin";
+import Footer from "./Footer";
 
 const AdminTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -247,6 +248,7 @@ const AdminTable = () => {
           </DialogActions>
         </Dialog>
       </div>
+      <Footer />
     </>
   );
 };

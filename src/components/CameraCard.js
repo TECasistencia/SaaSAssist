@@ -1,7 +1,7 @@
 import React from "react";
 import { Card, CardContent } from "@mui/material";
 import VideocamIcon from "@mui/icons-material/Videocam";
-import "./styles/styleInicio.css";
+import "../styles/styleInicio.css";
 
 function CameraCard({ title, estado, onClick }) {
   return (

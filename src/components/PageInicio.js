@@ -73,7 +73,6 @@ function PageInicio() {
       <Footer />
 
       <Dialog open={isModalOpen}>
-        {/* <DialogTitle>Phone Ringtone</DialogTitle> */}
         <DialogContent>
           <StartCamera
             handleClose={handleClose}
