@@ -19,6 +19,8 @@ import React, { useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
+import VisibilityIcon from "@mui/icons-material/Visibility";
+
 import Header from "./Header";
 import ModalAdmin from "../modals/ModalAdmin";
 
@@ -158,7 +160,13 @@ const AdminTable = () => {
                   <TableCell align="left">{admin.name}</TableCell>
                   <TableCell align="left">{admin.lastName}</TableCell>
                   <TableCell align="left">{admin.mail}</TableCell>
-                  <TableCell align="left">{admin.images}</TableCell>
+                  <TableCell sx={{ paddingLeft: 3 }} align="left">
+                    <Tooltip title="Ver imágenes" placement="top">
+                      <IconButton color="info" aria-label="ver">
+                        <VisibilityIcon />
+                      </IconButton>
+                    </Tooltip>
+                  </TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">
                       <Tooltip title="Eliminar" placement="top">
