@@ -23,7 +23,7 @@ const Login = () => {
   return (
     <div className="cont">
       <div className="container-login" style={{ gap: "1rem" }}>
-        <h2>Incio de sesión</h2>
+        <h2>Inicio de sesión</h2>
         <TextField sx={{ width: "100%" }} label="Nombre de usuario"></TextField>
         <FormControl sx={{ width: "100%" }} variant="outlined">
           <InputLabel htmlFor="outlined-adornment-password">
