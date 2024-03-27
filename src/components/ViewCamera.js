@@ -65,7 +65,9 @@ function ViewCamera() {
         )}
         <Dialog open={isModalOpen} onClose={handleCloseModal}>
           <DialogContent>
-            <ViewListAssist />
+            <div className="ViewListAssist">
+              <ViewListAssist />
+            </div>
           </DialogContent>
           <DialogActions>
             <div className="button-container">
