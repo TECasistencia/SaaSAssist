@@ -12,6 +12,7 @@
   align-items: center;
   padding-top: 3rem;
   margin: 0 0 0 0;
+  min-height: 100vh;
 }
 
 .container-modal {

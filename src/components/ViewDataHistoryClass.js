@@ -64,7 +64,7 @@ function ViewDataHistoryClass() {
                 {/* Cambiar el enlace por un botón */}
                 <Link
                   to={`/ViewDataHistoryDate/${classroom.id}`} // Ruta con el ID del aula
-                  state={{ className: classroom.name }} //
+                  state={{ className: classroom.name }}
                   className="button-link"
                 >
                   <Button variant="contained">{classroom.name}</Button>

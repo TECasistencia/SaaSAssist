@@ -45,13 +45,13 @@
   color: white;
 }
 
-.logo-pagina{
+.logo-pagina {
   display: flex;
   flex-direction: column;
   align-items: center;
 }
 
-.form-logo{
+.form-logo {
   display: flex;
   flex-direction: column;
   justify-content: center;
@@ -65,16 +65,15 @@
   border-radius: 5px;
 }
 
-.uploaded-row{
+.uploaded-row {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: .5em;
+  gap: 0.5em;
   padding: 10px 20px;
   border-radius: 5px;
   background-color: #dee2fa;
   width: fit-content;
   margin: auto;
-  margin-top: .5em;
-
+  margin-top: 0.5em;
 }

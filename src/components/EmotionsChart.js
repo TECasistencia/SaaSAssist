@@ -60,7 +60,6 @@ function EmotionsChart({
         left: "50%",
       };
     }
-    // Agrega más condiciones según sea necesario
   };
 
   return (
