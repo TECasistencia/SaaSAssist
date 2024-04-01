@@ -10,6 +10,7 @@ import ViewDataHistoryDate from "./components/ViewDataHistoryDate";
 import ViewDataHistoryAG from "./components/ViewDataHistoryAG";
 import GuestTable from "./components/GuestTable";
 import UserTable from "./components/UserTable";
+import ViewAsigClasesProfesor from "./components/ViewAsigClasesProfesor";
 
 const router = createBrowserRouter([
   {
@@ -48,6 +49,11 @@ const router = createBrowserRouter([
     path: "/ViewDataHistoryAG/:id",
     element: <ViewDataHistoryAG />,
   },
+  {
+    path: "/ViewAsigClasesProfesor",
+    element: <ViewAsigClasesProfesor />,
+  },
+
   // {
   //   path: "/home-page",
   //   element: <Drawer />,
