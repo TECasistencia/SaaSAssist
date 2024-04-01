@@ -81,6 +81,14 @@ function CustomMenu() {
           </Link>
         </MenuItem>
         <MenuItem onClick={handleClose}>
+          <Link
+            to="/ViewAsigClasesProfesor"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            Asignar Clases
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleClose}>
           <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
             Log out
           </Link>
