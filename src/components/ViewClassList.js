@@ -16,67 +16,51 @@ import React, { useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 
 import Header from "./Header";
-import ModalAsigClass from "../modals/ModalAsigClass";
+import ModalClassList from "../modals/ModalClassList";
 
-const ViewAsigClasesProfesor = () => {
+const ViewClassList = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
-  const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [userEdit, setUserEdit] = useState();
 
   const dialogRef = React.useRef(null);
 
-  const Professors = [
+  const Clases = [
     {
       id: "1",
-      name: "Luciano",
-      lastName: "Perez Chavarria",
-      asigClass: "Introducción",
+      name: "Introducción a la Programación",
     },
     {
       id: "2",
-      name: "Jaime",
-      lastName: "Hernandez",
-      asigClass: "Introducción",
+      name: "Estructuras de Datos",
     },
     {
       id: "3",
-      name: "Rogelio",
-      lastName: "Barboza",
-      asigClass: "Introducción",
+      name: "Algoritmos y Complejidad",
     },
     {
       id: "4",
-      name: "Denis",
-      lastName: "Fernandez",
-      asigClass: "Introducción",
+      name: "Bases de Datos",
     },
     {
       id: "5",
-      name: "Gerardo",
-      lastName: "Espinoza",
-      asigClass: "Introducción",
+      name: "Ingeniería de Software",
     },
     {
       id: "6",
-      name: "Belen",
-      lastName: "Lara",
-      asigClass: "Introducción",
+      name: "Desarrollo Web",
     },
   ];
 
-  const handleOpenEdit = (user) => {
-    setUserEdit(user);
+  const handleOpenEdit = (data) => {
+    setUserEdit(data);
     setOpenEdit(true);
   };
   const handleCloseEdit = () => {
     setOpenEdit(false);
   };
 
-  const handleCloseAdd = () => {
-    setOpenAdd(false);
-  };
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -95,7 +79,7 @@ const ViewAsigClasesProfesor = () => {
     <>
       <Header />
       <div className="container">
-        <h2>Asignar Clase</h2>
+        <h2>Listas de alumnos por clase</h2>
 
         <TableContainer sx={{ width: "80rem" }} component={Paper}>
           <Table sx={{ width: "80rem" }} aria-label="simple table">
@@ -103,36 +87,32 @@ const ViewAsigClasesProfesor = () => {
               <TableRow>
                 <TableCell>ID</TableCell>
                 <TableCell align="left">Nombre</TableCell>
-                <TableCell align="left">Apellidos</TableCell>
-                <TableCell align="left">Clases Asignadas</TableCell>
                 <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {(rowsPerPage > 0
-                ? Professors.slice(
+                ? Clases.slice(
                     page * rowsPerPage,
                     page * rowsPerPage + rowsPerPage
                   )
-                : Professors
-              ).map((professor) => (
+                : Clases
+              ).map((cls) => (
                 <TableRow
-                  key={professor.id}
+                  key={cls.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {professor.id}
+                    {cls.id}
                   </TableCell>
-                  <TableCell align="left">{professor.name}</TableCell>
-                  <TableCell align="left">{professor.lastName}</TableCell>
-                  <TableCell align="left">{professor.asigClass}</TableCell>
+                  <TableCell align="left">{cls.name}</TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">
                       <Tooltip title="Editar" placement="top">
                         <IconButton
                           color="success"
                           aria-label="edit"
-                          onClick={() => handleOpenEdit(professor)}
+                          onClick={() => handleOpenEdit(cls)}
                         >
                           <EditIcon />
                         </IconButton>
@@ -148,32 +128,18 @@ const ViewAsigClasesProfesor = () => {
           sx={{ width: "80rem" }}
           component="div"
           rowsPerPageOptions={[5, 10, 25]}
-          count={Professors.length}
+          count={Clases.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
           onRowsPerPageChange={handleChangeRowsPerPage}
         />
-        <Dialog TransitionProps={{ onEntering: handleEntering }} open={openAdd}>
-          <DialogContent>
-            <ModalAsigClass
-              isEdit={false}
-              user={null}
-              handleClose={handleCloseAdd}
-            />
-          </DialogContent>
-        </Dialog>
-
         <Dialog
           TransitionProps={{ onEntering: handleEntering }}
           open={openEdit}
         >
           <DialogContent>
-            <ModalAsigClass
-              isEdit={true}
-              user={userEdit}
-              handleClose={handleCloseEdit}
-            />
+            <ModalClassList data={userEdit} handleClose={handleCloseEdit} />
           </DialogContent>
         </Dialog>
       </div>
@@ -181,4 +147,4 @@ const ViewAsigClasesProfesor = () => {
   );
 };
 
-export default ViewAsigClasesProfesor;
+export default ViewClassList;

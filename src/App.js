@@ -11,6 +11,9 @@ import ViewDataHistoryAG from "./components/ViewDataHistoryAG";
 import GuestTable from "./components/GuestTable";
 import UserTable from "./components/UserTable";
 import ViewAsigClasesProfesor from "./components/ViewAsigClasesProfesor";
+import ViewAddCamera from "./components/ViewAddCamera";
+import ViewAddClases from "./components/ViewAddClases";
+import ViewClassList from "./components/ViewClassList";
 
 const router = createBrowserRouter([
   {
@@ -50,10 +53,22 @@ const router = createBrowserRouter([
     element: <ViewDataHistoryAG />,
   },
   {
+    path: "/ViewAddClases",
+    element: <ViewAddClases />,
+  },
+  {
     path: "/ViewAsigClasesProfesor",
     element: <ViewAsigClasesProfesor />,
   },
 
+  {
+    path: "/ViewAddCamera",
+    element: <ViewAddCamera />,
+  },
+  {
+    path: "/ViewClassList",
+    element: <ViewClassList />,
+  },
   // {
   //   path: "/home-page",
   //   element: <Drawer />,

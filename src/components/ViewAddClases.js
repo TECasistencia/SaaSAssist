@@ -11,72 +11,76 @@ import {
   TableContainer,
   Dialog,
   DialogContent,
+  DialogTitle,
+  DialogActions,
+  Button,
 } from "@mui/material";
 import React, { useState } from "react";
+import AddCircleIcon from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";
-
+import DeleteIcon from "@mui/icons-material/Delete";
 import Header from "./Header";
-import ModalAsigClass from "../modals/ModalAsigClass";
+import ModalClass from "../modals/ModalClass";
 
-const ViewAsigClasesProfesor = () => {
+const ViewAddClass = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
+  const [openDelete, setOpenDelete] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [userEdit, setUserEdit] = useState();
+  const [ClassEdit, setClassEdit] = useState();
 
   const dialogRef = React.useRef(null);
 
-  const Professors = [
+  const Clases = [
     {
       id: "1",
-      name: "Luciano",
-      lastName: "Perez Chavarria",
-      asigClass: "Introducción",
+      name: "Introducción a la Programación",
+      available: "5",
     },
     {
       id: "2",
-      name: "Jaime",
-      lastName: "Hernandez",
-      asigClass: "Introducción",
+      name: "Estructuras de Datos",
+      available: "18",
     },
     {
       id: "3",
-      name: "Rogelio",
-      lastName: "Barboza",
-      asigClass: "Introducción",
+      name: "Algoritmos y Complejidad",
+      available: "1",
     },
     {
       id: "4",
-      name: "Denis",
-      lastName: "Fernandez",
-      asigClass: "Introducción",
+      name: "Bases de Datos",
+      available: "2",
     },
     {
       id: "5",
-      name: "Gerardo",
-      lastName: "Espinoza",
-      asigClass: "Introducción",
+      name: "Ingeniería de Software",
+      available: "4",
     },
     {
       id: "6",
-      name: "Belen",
-      lastName: "Lara",
-      asigClass: "Introducción",
+      name: "Desarrollo Web",
+      available: "3",
     },
   ];
-
-  const handleOpenEdit = (user) => {
-    setUserEdit(user);
-    setOpenEdit(true);
-  };
-  const handleCloseEdit = () => {
-    setOpenEdit(false);
+  const handleOpenAdd = () => {
+    setOpenAdd(true);
   };
 
   const handleCloseAdd = () => {
     setOpenAdd(false);
   };
+
+  const handleOpenEdit = (Class) => {
+    setClassEdit(Class);
+    setOpenEdit(true);
+  };
+
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+  };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
@@ -91,48 +95,72 @@ const ViewAsigClasesProfesor = () => {
     }
   };
 
+  const handleClickOpenDelete = (Class) => {
+    // logica para eliminar el Class seleccionado
+    setOpenDelete(true);
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+  };
+
   return (
     <>
       <Header />
       <div className="container">
-        <h2>Asignar Clase</h2>
-
+        <h2>Clases</h2>
+        <div style={{ width: "80rem" }}>
+          <Tooltip title="Agregar" placement="top">
+            <IconButton onClick={handleOpenAdd} aria-label="add">
+              <AddCircleIcon fontSize="large" color="primary" />
+            </IconButton>
+          </Tooltip>
+        </div>
         <TableContainer sx={{ width: "80rem" }} component={Paper}>
           <Table sx={{ width: "80rem" }} aria-label="simple table">
             <TableHead>
               <TableRow>
                 <TableCell>ID</TableCell>
                 <TableCell align="left">Nombre</TableCell>
-                <TableCell align="left">Apellidos</TableCell>
-                <TableCell align="left">Clases Asignadas</TableCell>
+                <TableCell align="left">Disponibilidad</TableCell>
                 <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {(rowsPerPage > 0
-                ? Professors.slice(
+                ? Clases.slice(
                     page * rowsPerPage,
                     page * rowsPerPage + rowsPerPage
                   )
-                : Professors
-              ).map((professor) => (
+                : Clases
+              ).map((Class) => (
                 <TableRow
-                  key={professor.id}
+                  key={Class.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {professor.id}
+                    {Class.id}
                   </TableCell>
-                  <TableCell align="left">{professor.name}</TableCell>
-                  <TableCell align="left">{professor.lastName}</TableCell>
-                  <TableCell align="left">{professor.asigClass}</TableCell>
+                  <TableCell align="left">{Class.name}</TableCell>
+                  <TableCell align="left">{Class.available}</TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
+                    <div className="action-btn">
+                      <Tooltip title="Eliminar" placement="top">
+                        <IconButton
+                          color="error"
+                          aria-label="delete"
+                          onClick={() => handleClickOpenDelete(Class)}
+                        >
+                          <DeleteIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
                     <div className="action-btn">
                       <Tooltip title="Editar" placement="top">
                         <IconButton
                           color="success"
                           aria-label="edit"
-                          onClick={() => handleOpenEdit(professor)}
+                          onClick={() => handleOpenEdit(Class)}
                         >
                           <EditIcon />
                         </IconButton>
@@ -148,7 +176,7 @@ const ViewAsigClasesProfesor = () => {
           sx={{ width: "80rem" }}
           component="div"
           rowsPerPageOptions={[5, 10, 25]}
-          count={Professors.length}
+          count={Clases.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
@@ -156,9 +184,9 @@ const ViewAsigClasesProfesor = () => {
         />
         <Dialog TransitionProps={{ onEntering: handleEntering }} open={openAdd}>
           <DialogContent>
-            <ModalAsigClass
+            <ModalClass
               isEdit={false}
-              user={null}
+              data={null}
               handleClose={handleCloseAdd}
             />
           </DialogContent>
@@ -169,16 +197,33 @@ const ViewAsigClasesProfesor = () => {
           open={openEdit}
         >
           <DialogContent>
-            <ModalAsigClass
+            <ModalClass
               isEdit={true}
-              user={userEdit}
+              data={ClassEdit}
               handleClose={handleCloseEdit}
             />
           </DialogContent>
+        </Dialog>
+
+        <Dialog
+          open={openDelete}
+          onClose={handleCloseDelete}
+          aria-labelledby="alert-dialog-title"
+          aria-describedby="alert-dialog-description"
+        >
+          <DialogTitle id="alert-dialog-title">
+            {"¿Está seguro que desea eliminar la clase?"}
+          </DialogTitle>
+          <DialogActions>
+            <Button color="success">Aceptar</Button>
+            <Button color="error" onClick={handleCloseDelete} autoFocus>
+              Cancelar
+            </Button>
+          </DialogActions>
         </Dialog>
       </div>
     </>
   );
 };
 
-export default ViewAsigClasesProfesor;
+export default ViewAddClass;

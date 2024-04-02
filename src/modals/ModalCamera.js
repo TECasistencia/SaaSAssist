@@ -1,10 +1,10 @@
 import { Box, Button, TextField } from "@mui/material";
 import React, { useState } from "react";
 
-const ModalClass = ({ isEdit, data, handleClose }) => {
-  const [id, setid] = useState(isEdit ? data.id : "");
-  const [Name, setName] = useState(isEdit ? data.name : "");
-  const [Available, setAvailable] = useState(isEdit ? data.available : "");
+const ModalCamera = ({ isEdit, camera, handleClose }) => {
+  const [id, setid] = useState(isEdit ? camera.id : "");
+  const [Name, setName] = useState(isEdit ? camera.name : "");
+  const [Area, setArea] = useState(isEdit ? camera.area : "");
 
   const handleChangeId = (e) => {
     const inputValue = e.target.value;
@@ -16,14 +16,14 @@ const ModalClass = ({ isEdit, data, handleClose }) => {
     setName(inputValue);
   };
 
-  const handleChangeAvailable = (e) => {
+  const handleChangArea = (e) => {
     const inputValue = e.target.value;
-    setAvailable(inputValue);
+    setArea(inputValue);
   };
 
   return (
     <div className="container-modal">
-      <h2>{isEdit ? "Editar una clase" : "Agregar una clase"}</h2>
+      <h2>{isEdit ? "Editar una camara" : "Agregar una camara"}</h2>
 
       <Box
         component="form"
@@ -49,9 +49,9 @@ const ModalClass = ({ isEdit, data, handleClose }) => {
           />
           <TextField
             id="outlined"
-            label="Disponibilidad"
-            value={Available}
-            onChange={handleChangeAvailable}
+            label="Area"
+            value={Area}
+            onChange={handleChangArea}
           />
 
           <br />
@@ -67,4 +67,4 @@ const ModalClass = ({ isEdit, data, handleClose }) => {
   );
 };
 
-export default ModalClass;
+export default ModalCamera;
