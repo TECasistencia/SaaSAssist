@@ -82,12 +82,37 @@ function CustomMenu() {
         </MenuItem>
         <MenuItem onClick={handleClose}>
           <Link
+            to="/ViewAddClases"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            Clases
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleClose}>
+          <Link
             to="/ViewAsigClasesProfesor"
             style={{ textDecoration: "none", color: "inherit" }}
           >
             Asignar Clases
           </Link>
         </MenuItem>
+        <MenuItem onClick={handleClose}>
+          <Link
+            to="/ViewAddCamera"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            Camaras
+          </Link>
+        </MenuItem>
+        <MenuItem onClick={handleClose}>
+          <Link
+            to="/ViewClassList"
+            style={{ textDecoration: "none", color: "inherit" }}
+          >
+            Lista de alumnos
+          </Link>
+        </MenuItem>
+
         <MenuItem onClick={handleClose}>
           <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
             Log out
