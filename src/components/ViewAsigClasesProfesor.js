@@ -11,27 +11,23 @@ import {
   TableContainer,
   Dialog,
   DialogContent,
-  DialogTitle,
-  DialogActions,
-  Button,
 } from "@mui/material";
 import React, { useState } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 
 import Header from "./Header";
-import ModalClass from "../modals/ModalClass";
+import ModalAsigClass from "../modals/ModalAsigClass";
 
 const ViewAsigClasesProfesor = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
-  const [openDelete, setOpenDelete] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [userEdit, setUserEdit] = useState();
 
   const dialogRef = React.useRef(null);
 
-  const Users = [
+  const Professors = [
     {
       id: "1",
       name: "Luciano",
@@ -95,15 +91,11 @@ const ViewAsigClasesProfesor = () => {
     }
   };
 
-  const handleCloseDelete = () => {
-    setOpenDelete(false);
-  };
-
   return (
     <>
       <Header />
       <div className="container">
-        <h2>Asignar Clases</h2>
+        <h2>Asignar Clase</h2>
 
         <TableContainer sx={{ width: "80rem" }} component={Paper}>
           <Table sx={{ width: "80rem" }} aria-label="simple table">
@@ -118,29 +110,29 @@ const ViewAsigClasesProfesor = () => {
             </TableHead>
             <TableBody>
               {(rowsPerPage > 0
-                ? Users.slice(
+                ? Professors.slice(
                     page * rowsPerPage,
                     page * rowsPerPage + rowsPerPage
                   )
-                : Users
-              ).map((user) => (
+                : Professors
+              ).map((professor) => (
                 <TableRow
-                  key={user.id}
+                  key={professor.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {user.id}
+                    {professor.id}
                   </TableCell>
-                  <TableCell align="left">{user.name}</TableCell>
-                  <TableCell align="left">{user.lastName}</TableCell>
-                  <TableCell align="left">{user.asigClass}</TableCell>
+                  <TableCell align="left">{professor.name}</TableCell>
+                  <TableCell align="left">{professor.lastName}</TableCell>
+                  <TableCell align="left">{professor.asigClass}</TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">
                       <Tooltip title="Editar" placement="top">
                         <IconButton
                           color="success"
                           aria-label="edit"
-                          onClick={() => handleOpenEdit(user)}
+                          onClick={() => handleOpenEdit(professor)}
                         >
                           <EditIcon />
                         </IconButton>
@@ -156,7 +148,7 @@ const ViewAsigClasesProfesor = () => {
           sx={{ width: "80rem" }}
           component="div"
           rowsPerPageOptions={[5, 10, 25]}
-          count={Users.length}
+          count={Professors.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
@@ -164,7 +156,7 @@ const ViewAsigClasesProfesor = () => {
         />
         <Dialog TransitionProps={{ onEntering: handleEntering }} open={openAdd}>
           <DialogContent>
-            <ModalClass
+            <ModalAsigClass
               isEdit={false}
               user={null}
               handleClose={handleCloseAdd}
@@ -177,29 +169,12 @@ const ViewAsigClasesProfesor = () => {
           open={openEdit}
         >
           <DialogContent>
-            <ModalClass
+            <ModalAsigClass
               isEdit={true}
               user={userEdit}
               handleClose={handleCloseEdit}
             />
           </DialogContent>
-        </Dialog>
-
-        <Dialog
-          open={openDelete}
-          onClose={handleCloseDelete}
-          aria-labelledby="alert-dialog-title"
-          aria-describedby="alert-dialog-description"
-        >
-          <DialogTitle id="alert-dialog-title">
-            {"¿Está seguro que desea eliminar el usuario?"}
-          </DialogTitle>
-          <DialogActions>
-            <Button color="success">Aceptar</Button>
-            <Button color="error" onClick={handleCloseDelete} autoFocus>
-              Cancelar
-            </Button>
-          </DialogActions>
         </Dialog>
       </div>
     </>
