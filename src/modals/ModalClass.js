@@ -1,62 +1,58 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  MenuItem,
-  Select,
-} from "@mui/material";
+import { Box, Button, TextField } from "@mui/material";
 import React, { useState } from "react";
 
-// Lista de clases de ingeniería en computación con atributo disponibles
-const classesList = [
-  { name: "Introducción a la Programación", available: 10 },
-  { name: "Estructuras de Datos", available: 5 },
-  { name: "Algoritmos y Complejidad", available: 0 }, // Clase no disponible
-  { name: "Bases de Datos", available: 8 },
-  { name: "Ingeniería de Software", available: 3 },
-  // Agrega más clases aquí según sea necesario
-];
+const ModalClass = ({ isEdit, data, handleClose }) => {
+  const [id, setid] = useState(isEdit ? data.id : "");
+  const [Name, setName] = useState(isEdit ? data.name : "");
+  const [Available, setAvailable] = useState(isEdit ? data.available : "");
 
-const ModalClass = ({ isEdit, user, handleClose }) => {
-  const [asigClass, setAsigClass] = useState(isEdit ? user.asigClass : "");
-
-  const handleChangeAsigClass = (e) => {
-    const selectedClass = e.target.value;
-    setAsigClass(selectedClass);
+  const handleChangeId = (e) => {
+    const inputValue = e.target.value;
+    setid(inputValue);
   };
 
-  const availableClasses = classesList.filter((cls) => cls.available > 0);
+  const handleChangeName = (e) => {
+    const inputValue = e.target.value;
+    setName(inputValue);
+  };
+
+  const handleChangeAvailable = (e) => {
+    const inputValue = e.target.value;
+    setAvailable(inputValue);
+  };
 
   return (
     <div className="container-modal">
-      <h2>{isEdit ? "Editar usuario" : ""}</h2>
+      <h2>{isEdit ? "Editar una clase" : "Agregar una clase"}</h2>
 
       <Box
         component="form"
         sx={{
-          "& .MuiFormControl-root": { m: 1, width: "20rem" },
+          "& .MuiTextField-root": { m: 1, width: "20rem" },
         }}
         noValidate
         autoComplete="off"
       >
         <div>
-          <FormControl variant="outlined">
-            <InputLabel id="select-class-label">Asignar Clases</InputLabel>
-            <Select
-              labelId="select-class-label"
-              id="select-class"
-              value={asigClass}
-              onChange={handleChangeAsigClass}
-              label="Asignar Clases"
-            >
-              {availableClasses.map((cls, index) => (
-                <MenuItem key={index} value={cls.name}>
-                  {cls.name}
-                </MenuItem>
-              ))}
-            </Select>
-          </FormControl>
+          <TextField
+            id="outlined"
+            label="ID"
+            value={id}
+            onChange={handleChangeId}
+            disabled={isEdit}
+          />
+          <TextField
+            id="outlined"
+            label="Nombre"
+            value={Name}
+            onChange={handleChangeName}
+          />
+          <TextField
+            id="outlined"
+            label="Disponibilidad"
+            value={Available}
+            onChange={handleChangeAvailable}
+          />
 
           <br />
           <div className="button-container">
