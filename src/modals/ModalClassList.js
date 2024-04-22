@@ -59,17 +59,17 @@ const ModalClassList = ({ data, handleClose }) => {
         <Table>
           <TableHead>
             <TableRow>
-              <TableCell>Nombre</TableCell>
-              <TableCell>Apellidos</TableCell>
-              <TableCell>Acción</TableCell>
+              <TableCell align="left">Nombre</TableCell>
+              <TableCell align="left">Apellidos</TableCell>
+              <TableCell align="right">Acción</TableCell>
             </TableRow>
           </TableHead>
           <TableBody>
             {filteredStudents.map((student, index) => (
               <TableRow key={index}>
-                <TableCell>{student.firstName}</TableCell>
-                <TableCell>{student.lastName}</TableCell>
-                <TableCell>
+                <TableCell align="left">{student.firstName}</TableCell>
+                <TableCell align="left">{student.lastName}</TableCell>
+                <TableCell align="right">
                   <Checkbox
                     checked={selectedStudents.includes(index)}
                     onChange={() => handleCheckboxChange(index)}
