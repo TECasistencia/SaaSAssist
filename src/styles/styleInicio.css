@@ -7,6 +7,7 @@
 
 .cameraContent {
   display: flex;
+  width: 100px;
   flex-direction: column;
   background: #51719a;
   color: #ffffff;

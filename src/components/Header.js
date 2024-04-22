@@ -6,7 +6,7 @@ function Header() {
   return (
     <AppBar position="static" className="header">
       <Toolbar>
-        <Typography variant="h6">Mi Aplicación</Typography>
+        <Typography variant="h6">SaaSAssist</Typography>
         <Box sx={{ flexGrow: 1 }} />
         <CustomMenu />
       </Toolbar>

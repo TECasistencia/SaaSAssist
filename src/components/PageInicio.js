@@ -9,9 +9,9 @@ import { Button, Dialog, DialogActions, DialogContent } from "@mui/material";
 import { Link } from "react-router-dom";
 
 const initialCameras = [
-  { title: "Título de la cámara 1", estado: "Offline" },
-  { title: "Título de la cámara 2", estado: "Offline" },
-  { title: "Título de la cámara 3", estado: "Offline" },
+  { title: "Cámara 1", estado: "Offline" },
+  { title: "Cámara 2", estado: "Offline" },
+  { title: "Cámara 3", estado: "Offline" },
 ];
 
 function PageInicio() {
