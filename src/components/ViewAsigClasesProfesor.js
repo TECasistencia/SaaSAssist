@@ -120,7 +120,10 @@ const ViewAsigClasesProfesor = () => {
                   key={professor.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  <TableCell component="th" scope="row">
+                  <TableCell
+                    component="th"
+                    scope="row"
+                  >
                     {professor.id}
                   </TableCell>
                   <TableCell align="left">{professor.name}</TableCell>

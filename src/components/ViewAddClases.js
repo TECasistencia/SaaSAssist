@@ -120,9 +120,11 @@ const ViewAddClass = () => {
           <Table sx={{ width: "80rem" }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
+                <TableCell >ID</TableCell>
                 <TableCell align="left">Nombre</TableCell>
-                <TableCell align="left">Disponibilidad</TableCell>
+                <TableCell align="left" sx={{ textAlign: "center" }}>
+                  Disponibilidad
+                </TableCell>
                 <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </TableHead>
@@ -138,11 +140,16 @@ const ViewAddClass = () => {
                   key={Class.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  <TableCell component="th" scope="row">
+                  <TableCell
+                    component="th"
+                    scope="row"
+                  >
                     {Class.id}
                   </TableCell>
                   <TableCell align="left">{Class.name}</TableCell>
-                  <TableCell align="left">{Class.available}</TableCell>
+                  <TableCell align="left" sx={{ textAlign: "center" }}>
+                    {Class.available}
+                  </TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">
                       <Tooltip title="Eliminar" placement="top">

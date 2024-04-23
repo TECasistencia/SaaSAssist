@@ -121,77 +121,82 @@ function ViewDataHistoryDate() {
   return (
     <div className="contentDate">
       <Header />
-      <h2>Nombre de la clase: {state?.className}</h2>
-      <div className="contentInternDate">
-        <TextField
-          type="text"
-          value={searchQuery}
-          onChange={handleSearchChange}
-          placeholder="Buscar..."
-          variant="outlined"
-          style={{ marginRight: "1rem" }}
+      <div className="container-view-data-history-date">
+        <h2>Nombre de la clase: {state?.className}</h2>
+        <div className="contentInternDate">
+          <TextField
+            type="text"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            placeholder="Buscar..."
+            variant="outlined"
+            style={{ marginRight: "1rem", width: "17rem" }}
+          />
+          <FormControl variant="outlined">
+            <InputLabel id="filter-label">Filtrar por</InputLabel>
+            <Select
+              labelId="filter-label"
+              value={filter}
+              onChange={handleFilterChange}
+              label="Filtrar por"
+            >
+              <MenuItem value="classroom">Aula</MenuItem>
+              <MenuItem value="date">Fecha</MenuItem>
+              <MenuItem value="teacher">Profesor</MenuItem>
+            </Select>
+          </FormControl>
+        </div>
+        <TableContainer sx={{ width: "90rem" }} component={Paper}>
+          <Table>
+            <TableHead>
+              <TableRow>
+                <TableCell>Fecha</TableCell>
+                <TableCell>Aula</TableCell>
+                <TableCell>Profesor</TableCell>
+                <TableCell align="right" sx={{ paddingRight: 4.5 }}>
+                  Acciones
+                </TableCell>
+              </TableRow>
+            </TableHead>
+            <TableBody>
+              {filteredData
+                .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
+                .map((row) => (
+                  <TableRow key={row.id}>
+                    <TableCell>{row.date}</TableCell>
+                    <TableCell>{row.classroom}</TableCell>
+                    <TableCell>{row.teacher}</TableCell>
+                    <TableCell align="right">
+                      <Link
+                        to={`/ViewDataHistoryAG/${row.id}`}
+                        state={{
+                          date: row.date,
+                          className: state?.className,
+                          classroom: row.classroom,
+                          teacher: row.teacher,
+                        }}
+                      >
+                        <Button variant="contained" color="primary">
+                          Detalle
+                        </Button>
+                      </Link>
+                    </TableCell>
+                  </TableRow>
+                ))}
+            </TableBody>
+          </Table>
+        </TableContainer>
+        <TablePagination
+          rowsPerPageOptions={[5, 10, 25]}
+          sx={{ width: "90rem" }}
+          component="div"
+          count={filteredData.length}
+          rowsPerPage={rowsPerPage}
+          page={page}
+          onPageChange={handleChangePage}
+          onRowsPerPageChange={handleChangeRowsPerPage}
         />
-        <FormControl variant="outlined">
-          <InputLabel id="filter-label">Filtrar por</InputLabel>
-          <Select
-            labelId="filter-label"
-            value={filter}
-            onChange={handleFilterChange}
-            label="Filtrar por"
-          >
-            <MenuItem value="classroom">Aula</MenuItem>
-            <MenuItem value="date">Fecha</MenuItem>
-            <MenuItem value="teacher">Profesor</MenuItem>
-          </Select>
-        </FormControl>
       </div>
-      <TableContainer component={Paper}>
-        <Table>
-          <TableHead>
-            <TableRow>
-              <TableCell>Fecha</TableCell>
-              <TableCell>Aula</TableCell>
-              <TableCell>Profesor</TableCell>
-              <TableCell>Acciones</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {filteredData
-              .slice(page * rowsPerPage, page * rowsPerPage + rowsPerPage)
-              .map((row) => (
-                <TableRow key={row.id}>
-                  <TableCell>{row.date}</TableCell>
-                  <TableCell>{row.classroom}</TableCell>
-                  <TableCell>{row.teacher}</TableCell>
-                  <TableCell>
-                    <Link
-                      to={`/ViewDataHistoryAG/${row.id}`}
-                      state={{
-                        date: row.date,
-                        className: state?.className,
-                        classroom: row.classroom,
-                        teacher: row.teacher,
-                      }}
-                    >
-                      <Button variant="contained" color="primary">
-                        Detalle
-                      </Button>
-                    </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-          </TableBody>
-        </Table>
-      </TableContainer>
-      <TablePagination
-        rowsPerPageOptions={[5, 10, 25]}
-        component="div"
-        count={filteredData.length}
-        rowsPerPage={rowsPerPage}
-        page={page}
-        onPageChange={handleChangePage}
-        onRowsPerPageChange={handleChangeRowsPerPage}
-      />
       <Footer />
     </div>
   );

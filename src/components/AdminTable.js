@@ -135,11 +135,13 @@ const AdminTable = () => {
           <Table sx={{ width: "70rem" }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
+                <TableCell >ID</TableCell>
                 <TableCell align="left">Nombre</TableCell>
                 <TableCell align="left">Apellidos</TableCell>
                 <TableCell align="left">Correo</TableCell>
-                <TableCell align="left">Imagenes</TableCell>
+                <TableCell align="left" sx={{ textAlign: "center" }}>
+                  Imagenes
+                </TableCell>
                 <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </TableHead>
@@ -155,13 +157,16 @@ const AdminTable = () => {
                   key={admin.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  <TableCell component="th" scope="row">
+                  <TableCell
+                    component="th"
+                    scope="row"
+                  >
                     {admin.id}
                   </TableCell>
                   <TableCell align="left">{admin.name}</TableCell>
                   <TableCell align="left">{admin.lastName}</TableCell>
                   <TableCell align="left">{admin.mail}</TableCell>
-                  <TableCell sx={{ paddingLeft: 3 }} align="left">
+                  <TableCell align="left" sx={{ textAlign: "center" }}>
                     <Tooltip title="Ver imágenes" placement="top">
                       <IconButton color="info" aria-label="ver">
                         <VisibilityIcon />

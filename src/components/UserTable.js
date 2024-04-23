@@ -145,8 +145,12 @@ const UserTable = () => {
                 <TableCell align="left">Nombre</TableCell>
                 <TableCell align="left">Apellidos</TableCell>
                 <TableCell align="left">Correo</TableCell>
-                <TableCell align="left">Imagenes</TableCell>
-                <TableCell align="left">ID invitado (Padre)</TableCell>
+                <TableCell align="left" sx={{ textAlign: "center" }}>
+                  Imagenes
+                </TableCell>
+                <TableCell align="left" sx={{ textAlign: "center" }}>
+                  ID invitado (Padre)
+                </TableCell>
                 <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </TableHead>
@@ -162,13 +166,16 @@ const UserTable = () => {
                   key={user.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  <TableCell component="th" scope="row">
+                  <TableCell
+                    component="th"
+                    scope="row"
+                  >
                     {user.id}
                   </TableCell>
                   <TableCell align="left">{user.name}</TableCell>
                   <TableCell align="left">{user.lastName}</TableCell>
                   <TableCell align="left">{user.mail}</TableCell>
-                  <TableCell sx={{ paddingLeft: 3 }} align="left">
+                  <TableCell align="left" sx={{ textAlign: "center" }}>
                     <Tooltip title="Ver imágenes" placement="top">
                       <IconButton color="info" aria-label="ver">
                         {/* se mostraría el enlace donde se tienen las imagenes */}
@@ -176,7 +183,9 @@ const UserTable = () => {
                       </IconButton>
                     </Tooltip>
                   </TableCell>
-                  <TableCell align="left">{user.idGuest}</TableCell>
+                  <TableCell align="left" sx={{ textAlign: "center" }}>
+                    {user.idGuest}
+                  </TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">
                       <Tooltip title="Eliminar" placement="top">

@@ -132,11 +132,13 @@ const GuestTable = () => {
           <Table sx={{ width: "70rem" }} aria-label="simple table">
             <TableHead>
               <TableRow>
-                <TableCell>ID</TableCell>
+                <TableCell >ID</TableCell>
                 <TableCell align="left">Nombre</TableCell>
                 <TableCell align="left">Apellidos</TableCell>
                 <TableCell align="left">Correo</TableCell>
-                <TableCell align="left">Contraseña</TableCell>
+                <TableCell align="left" sx={{ textAlign: "center" }}>
+                  Contraseña
+                </TableCell>
                 <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </TableHead>
@@ -152,13 +154,18 @@ const GuestTable = () => {
                   key={guest.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
-                  <TableCell component="th" scope="row">
+                  <TableCell
+                    component="th"
+                    scope="row"
+                  >
                     {guest.id}
                   </TableCell>
                   <TableCell align="left">{guest.name}</TableCell>
                   <TableCell align="left">{guest.lastName}</TableCell>
                   <TableCell align="left">{guest.mail}</TableCell>
-                  <TableCell align="left">{guest.pass}</TableCell>
+                  <TableCell align="left" sx={{ textAlign: "center" }}>
+                    {guest.pass}
+                  </TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">
                       <Tooltip title="Eliminar" placement="top">

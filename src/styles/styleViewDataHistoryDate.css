@@ -5,8 +5,9 @@
 }
 
 .contentInternDate {
-  flex: 1;
+  /* flex: 1;
   display: flex;
   align-items: center;
-  margin-bottom: 1rem;
+  margin-bottom: 1rem; */
+  padding: 3rem;
 }
