@@ -1,7 +1,12 @@
-import * as React from "react";
+import React from "react";
 import "./App.css";
+
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import AuthProvider from "./contexts/AuthContext";
+import PrivateRoute from "./contexts/PrivateRoute";
+
+// Importa tus componentes aquí
 import Login from "./components/Login";
-import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import AdminTable from "./components/AdminTable";
 import PageInicio from "./components/PageInicio";
 import ViewCamera from "./components/ViewCamera";
@@ -15,78 +20,72 @@ import ViewAddCamera from "./components/ViewAddCamera";
 import ViewAddClases from "./components/ViewAddClases";
 import ViewClassList from "./components/ViewClassList";
 
-const router = createBrowserRouter([
-  {
-    path: "/",
-    element: <Login />,
-  },
-  {
-    path: "/Admins",
-    element: <AdminTable />,
-  },
-  {
-    path: "/Guests",
-    element: <GuestTable />,
-  },
-  {
-    path: "/Users",
-    element: <UserTable />,
-  },
-  {
-    path: "/Inicio",
-    element: <PageInicio />,
-  },
-  {
-    path: "/ViewCamera",
-    element: <ViewCamera />,
-  },
-  {
-    path: "/ViewDataHistoryClass",
-    element: <ViewDataHistoryClass />,
-  },
-  {
-    path: "/ViewDataHistoryDate/:id",
-    element: <ViewDataHistoryDate />,
-  },
-  {
-    path: "/ViewDataHistoryAG/:id",
-    element: <ViewDataHistoryAG />,
-  },
-  {
-    path: "/ViewAddClases",
-    element: <ViewAddClases />,
-  },
-  {
-    path: "/ViewAsigClasesProfesor",
-    element: <ViewAsigClasesProfesor />,
-  },
-
-  {
-    path: "/ViewAddCamera",
-    element: <ViewAddCamera />,
-  },
-  {
-    path: "/ViewClassList",
-    element: <ViewClassList />,
-  },
-  // {
-  //   path: "/home-page",
-  //   element: <Drawer />,
-  //   children: [
-  //     {
-  //       path: "usuarios",
-  //       element: <UsersTable />,
-  //     },
-
-  //   ],
-  // },
-]);
-
 function App() {
   return (
-    <React.StrictMode>
-      <RouterProvider router={router} />
-    </React.StrictMode>
+    <AuthProvider>
+      <Router>
+        <Routes>
+          <Route path="/Login" element={<Login />} />
+
+          <Route path="/" element={<PrivateRoute />}>
+            <Route path="/" element={<PageInicio />} />
+          </Route>
+
+          <Route path="/Admins" element={<PrivateRoute />}>
+            <Route path="/Admins" element={<AdminTable />} />
+          </Route>
+
+          <Route path="/Users" element={<PrivateRoute />}>
+            <Route path="/Users" element={<UserTable />} />
+          </Route>
+
+          <Route path="/Guests" element={<PrivateRoute />}>
+            <Route path="/Guests" element={<GuestTable />} />
+          </Route>
+
+          <Route path="/ViewAddClases" element={<PrivateRoute />}>
+            <Route path="/ViewAddClases" element={<ViewAddClases />} />
+          </Route>
+
+          <Route path="/ViewDataHistoryClass" element={<PrivateRoute />}>
+            <Route
+              path="/ViewDataHistoryClass"
+              element={<ViewDataHistoryClass />}
+            />
+          </Route>
+
+          <Route path="/ViewAddCamera" element={<PrivateRoute />}>
+            <Route path="/ViewAddCamera" element={<ViewAddCamera />} />
+          </Route>
+
+          <Route path="/ViewCamera" element={<PrivateRoute />}>
+            <Route path="/ViewCamera" element={<ViewCamera />} />
+          </Route>
+
+          <Route path="/ViewDataHistoryDate" element={<PrivateRoute />}>
+            <Route
+              path="/ViewDataHistoryDate"
+              element={<ViewDataHistoryDate />}
+            />
+          </Route>
+
+          <Route path="/ViewDataHistoryAG" element={<PrivateRoute />}>
+            <Route path="/ViewDataHistoryAG" element={<ViewDataHistoryAG />} />
+          </Route>
+
+          <Route path="/ViewAsigClasesProfesor" element={<PrivateRoute />}>
+            <Route
+              path="/ViewAsigClasesProfesor"
+              element={<ViewAsigClasesProfesor />}
+            />
+          </Route>
+
+          <Route path="/ViewClassList" element={<PrivateRoute />}>
+            <Route path="/ViewClassList" element={<ViewClassList />} />
+          </Route>
+        </Routes>
+      </Router>
+    </AuthProvider>
   );
 }
 

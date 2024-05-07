@@ -41,10 +41,7 @@ function CustomMenu() {
         TransitionComponent={Fade}
       >
         <MenuItem onClick={handleClose}>
-          <Link
-            to="/Inicio"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
+          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
             Inicio
           </Link>
         </MenuItem>
