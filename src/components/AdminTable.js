@@ -15,7 +15,9 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useContext, useEffect } from "react";
+
+import { AuthContext } from "../contexts/AuthContext";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -24,6 +26,7 @@ import VisibilityIcon from "@mui/icons-material/Visibility";
 import Header from "./Header";
 import ModalAdmin from "../modals/ModalAdmin";
 import Footer from "./Footer";
+import AdminController from "../serviceApi/adminController";
 
 const AdminTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -32,53 +35,10 @@ const AdminTable = () => {
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [adminEdit, setAdminEdit] = useState();
+  const [admins, setAdmins] = useState([]);
+  const { token } = useContext(AuthContext);
 
   const dialogRef = React.useRef(null);
-
-  const Admins = [
-    {
-      id: "1",
-      name: "Juan",
-      lastName: "Perez Chavarria",
-      mail: "juanp@asrt.com",
-      images: "img1, img2",
-    },
-    {
-      id: "2",
-      name: "Luis",
-      lastName: "Castillo",
-      mail: "luisc@ast.com",
-      images: "img1, img2",
-    },
-    {
-      id: "3",
-      name: "Alison",
-      lastName: "Gonzalez Jara",
-      mail: "luisc@ast.com",
-      images: "img1, img2",
-    },
-    {
-      id: "4",
-      name: "Guillermo",
-      lastName: "Perez Chavarria",
-      mail: "juanp@asrt.com",
-      images: "img1, img2",
-    },
-    {
-      id: "5",
-      name: "Emiliano",
-      lastName: "Castillo",
-      mail: "luisc@ast.com",
-      images: "img1, img2",
-    },
-    {
-      id: "6",
-      name: "Adonis",
-      lastName: "Gonzalez Jara",
-      mail: "luisc@ast.com",
-      images: "img1, img2",
-    },
-  ];
 
   const handleOpenEdit = (admin) => {
     setAdminEdit(admin);
@@ -118,6 +78,23 @@ const AdminTable = () => {
     setOpenDelete(false);
   };
 
+  const getAdmins = async () => {
+    try {
+      // Llamar a la función InsertPerson del controlador PersonaController
+      const result = await AdminController.GetAdmins(2, token);
+      setAdmins(result);
+
+      // Aquí puedes hacer algo después de insertar la persona, como cerrar el modal
+    } catch (error) {
+      console.error("Error al insertar la persona:", error);
+      // Aquí puedes manejar el error de alguna manera, como mostrando un mensaje al usuario
+    }
+  };
+
+  useEffect(() => {
+    getAdmins();
+  }, []);
+
   return (
     <>
       <Header />
@@ -145,11 +122,11 @@ const AdminTable = () => {
             </TableHead>
             <TableBody>
               {(rowsPerPage > 0
-                ? Admins.slice(
+                ? admins.slice(
                     page * rowsPerPage,
                     page * rowsPerPage + rowsPerPage
                   )
-                : Admins
+                : admins
               ).map((admin) => (
                 <TableRow
                   key={admin.id}
@@ -158,9 +135,9 @@ const AdminTable = () => {
                   <TableCell component="th" scope="row">
                     {admin.id}
                   </TableCell>
-                  <TableCell align="left">{admin.name}</TableCell>
-                  <TableCell align="left">{admin.lastName}</TableCell>
-                  <TableCell align="left">{admin.mail}</TableCell>
+                  <TableCell align="left">{admin.primer_Nombre}</TableCell>
+                  <TableCell align="left">{admin.primer_Apellido}</TableCell>
+                  <TableCell align="left">{admin.correo_Electronico}</TableCell>
                   <TableCell sx={{ paddingLeft: 3 }} align="left">
                     <Tooltip title="Ver imágenes" placement="top">
                       <IconButton color="info" aria-label="ver">
@@ -201,7 +178,7 @@ const AdminTable = () => {
           sx={{ width: "70rem" }}
           component="div"
           rowsPerPageOptions={[5, 10, 25]}
-          count={Admins.length}
+          count={admins.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
