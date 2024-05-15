@@ -30,7 +30,7 @@ const Login = () => {
     try {
       const resultado = await authenticate(username, password);
       if (resultado) {
-        navigate("/Admins");
+        navigate("/");
       }
     } catch (error) {
       console.error("Error al iniciar sesión:", error.message);
