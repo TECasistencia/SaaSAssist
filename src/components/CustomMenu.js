@@ -1,4 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useContext } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 import Button from "@mui/material/Button";
 import Menu from "@mui/material/Menu";
 import MenuItem from "@mui/material/MenuItem";
@@ -8,6 +9,7 @@ import { Link } from "react-router-dom";
 
 function CustomMenu() {
   const [anchorEl, setAnchorEl] = useState(null); // Estado para controlar la apertura del menú
+  const { isAdmin, isInvited, isPrincipal } = useContext(AuthContext);
 
   // Función para manejar el clic en el botón de menú
   const handleClick = (event) => {
@@ -18,6 +20,66 @@ function CustomMenu() {
   const handleClose = () => {
     setAnchorEl(null);
   };
+
+  // Define los elementos del menú
+  const menuItems = [
+    {
+      label: "Inicio",
+      to: "/",
+    },
+    ...(isPrincipal
+      ? [
+          {
+            label: "Administradores",
+            to: "/Admins",
+          },
+          {
+            label: "Clases",
+            to: "/ViewAddClases",
+          },
+          {
+            label: "Asignar clases",
+            to: "/ViewAsigClasesProfesor",
+          },
+          {
+            label: "Cámaras",
+            to: "/ViewAddCamera",
+          },
+        ]
+      : []),
+    ...(isPrincipal || isAdmin
+      ? [
+          {
+            label: "Usuarios",
+            to: "/Users",
+          },
+          {
+            label: "Historial de datos",
+            to: "/ViewDataHistoryClass",
+          },
+          {
+            label: "Lista de alumnos",
+            to: "/ViewClassList",
+          },
+          {
+            label: "Invitados",
+            to: "/Guests",
+          },
+        ]
+      : []),
+    ...(isInvited
+      ? [
+          {
+            label: "Historial de datos",
+            to: "/ViewDataHistoryClass",
+          },
+        ]
+      : []),
+    {
+      label: "Cerrar sesión",
+      to: "/Login",
+    },
+  ];
 
   return (
     <div>
@@ -40,81 +102,16 @@ function CustomMenu() {
         onClose={handleClose}
         TransitionComponent={Fade}
       >
-        <MenuItem onClick={handleClose}>
-          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-            Inicio
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Link
-            to="/Admins"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            Administradores
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Link
-            to="/ViewDataHistoryClass"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            Historial de datos
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Link
-            to="/Guests"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            Invitados
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Link
-            to="/Users"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            Usuarios
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Link
-            to="/ViewAddClases"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            Clases
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Link
-            to="/ViewAsigClasesProfesor"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            Asignar clases
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Link
-            to="/ViewAddCamera"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            Camaras
-          </Link>
-        </MenuItem>
-        <MenuItem onClick={handleClose}>
-          <Link
-            to="/ViewClassList"
-            style={{ textDecoration: "none", color: "inherit" }}
-          >
-            Lista de alumnos
-          </Link>
-        </MenuItem>
-
-        <MenuItem onClick={handleClose}>
-          <Link to="/" style={{ textDecoration: "none", color: "inherit" }}>
-            Cerrar sesión
-          </Link>
-        </MenuItem>
+        {menuItems.map((item, index) => (
+          <MenuItem key={index} onClick={handleClose}>
+            <Link
+              to={item.to}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              {item.label}
+            </Link>
+          </MenuItem>
+        ))}
       </Menu>
     </div>
   );
