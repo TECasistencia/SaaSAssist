@@ -1,4 +1,4 @@
-import { BACKEND } from "../serviceApi/backend";
+import { BACKEND } from "./Backend";
 
 export const getCountrys = async (token) => {
   try {

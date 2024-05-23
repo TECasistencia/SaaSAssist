@@ -22,7 +22,7 @@ import DeleteIcon from "@mui/icons-material/Delete";
 import Header from "./Header";
 import ModalCamera from "../modals/ModalCamera";
 
-const ViewAddCamera = () => {
+const CameraTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [openDelete, setOpenDelete] = useState(false);
@@ -226,4 +226,4 @@ const ViewAddCamera = () => {
   );
 };
 
-export default ViewAddCamera;
+export default CameraTable;

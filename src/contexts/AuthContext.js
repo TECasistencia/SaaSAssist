@@ -1,6 +1,6 @@
 import { createContext, useState } from "react";
-import { jwtDecode } from "jwt-decode";
-import { BACKEND } from "../serviceApi/backend";
+import { jwtDecode } from "jwt-decode"; // Importar jwtDecode como una función nombrada
+import { BACKEND } from "../serviceApi/Backend";
 
 export const AuthContext = createContext();
 
@@ -12,8 +12,6 @@ const AuthProvider = ({ children }) => {
   const [dataUser, setDataUser] = useState();
   const [token, setToken] = useState();
 
-  // Función para realizar la autenticación mediante API
-  // Función para determinar el rol del usuario
   const determinarRol = (decodedToken) => {
     const rol = parseInt(decodedToken.Rol);
 
@@ -45,7 +43,6 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Llamada a la función determinarRol dentro de la función authenticate
   const authenticate = async (username, password) => {
     try {
       const response = await fetch(BACKEND + "Usuario/Autenticar", {
@@ -59,20 +56,28 @@ const AuthProvider = ({ children }) => {
         }),
       });
 
+      const contentType = response.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        throw new Error("Respuesta inesperada del servidor");
+      }
+
       const data = await response.json();
+
       const token = data.token;
       console.log(token);
       setToken(token);
-      // Decodificar el token JWT
+
       const decodedToken = jwtDecode(token);
 
       if (!response.ok) {
         throw new Error("Error al iniciar sesión");
       }
+
       if (decodedToken.Activo === "True") {
         setIsAuthenticated(true);
         setDataUser(decodedToken);
       }
+
       determinarRol(decodedToken);
 
       return true;

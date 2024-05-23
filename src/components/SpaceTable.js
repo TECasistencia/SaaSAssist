@@ -1,3 +1,4 @@
+import React, { useState, useEffect, useCallback, useContext } from "react";
 import {
   Table,
   TableBody,
@@ -15,75 +16,87 @@ import {
   DialogActions,
   Button,
 } from "@mui/material";
-import React, { useState } from "react";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import Header from "./Header";
-import ModalClass from "../modals/ModalClass";
+import ModalSpace from "../modals/ModalSpace";
+import EspacioController from "../serviceApi/EspacioController";
 
-const ViewAddClass = () => {
+import { AuthContext } from "../contexts/AuthContext";
+
+const SpaceTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
   const [page, setPage] = useState(0);
   const [openDelete, setOpenDelete] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [ClassEdit, setClassEdit] = useState();
+  const [spaceEdit, setSpaceEdit] = useState(null);
+  const [spaces, setSpaces] = useState([]);
+  const [spaceToDelete, setSpaceToDelete] = useState(null);
 
+  const { dataUser, token } = useContext(AuthContext);
   const dialogRef = React.useRef(null);
+  const idOrganizacion = parseInt(dataUser.IdOrganizacion);
 
-  const Clases = [
-    {
-      id: "1",
-      name: "Introducción a la Programación",
-      available: "5",
-    },
-    {
-      id: "2",
-      name: "Estructuras de Datos",
-      available: "18",
-    },
-    {
-      id: "3",
-      name: "Algoritmos y Complejidad",
-      available: "1",
-    },
-    {
-      id: "4",
-      name: "Bases de Datos",
-      available: "2",
-    },
-    {
-      id: "5",
-      name: "Ingeniería de Software",
-      available: "4",
-    },
-    {
-      id: "6",
-      name: "Desarrollo Web",
-      available: "3",
-    },
-  ];
+  const fetchSpaces = useCallback(async () => {
+    try {
+      const fetchedSpaces = await EspacioController.GetSpaces(
+        idOrganizacion,
+        token
+      );
+      setSpaces(fetchedSpaces);
+    } catch (error) {
+      console.error("Error fetching spaces:", error);
+    }
+  }, [idOrganizacion, token]);
+
+  useEffect(() => {
+    fetchSpaces();
+  }, [fetchSpaces]);
+
   const handleOpenAdd = () => {
     setOpenAdd(true);
   };
 
   const handleCloseAdd = () => {
     setOpenAdd(false);
+    fetchSpaces();
   };
 
-  const handleOpenEdit = (Class) => {
-    setClassEdit(Class);
+  const handleOpenEdit = (space) => {
+    setSpaceEdit(space);
     setOpenEdit(true);
   };
 
   const handleCloseEdit = () => {
     setOpenEdit(false);
+    fetchSpaces();
+  };
+
+  const handleClickOpenDelete = (space) => {
+    setSpaceToDelete(space);
+    setOpenDelete(true);
+  };
+
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+  };
+
+  const handleDelete = async () => {
+    try {
+      await EspacioController.DeleteSpace(spaceToDelete.id, token);
+      handleCloseDelete();
+      fetchSpaces();
+    } catch (error) {
+      console.error("Error deleting space:", error);
+    }
   };
 
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -95,20 +108,11 @@ const ViewAddClass = () => {
     }
   };
 
-  const handleClickOpenDelete = (Class) => {
-    // logica para eliminar el Class seleccionado
-    setOpenDelete(true);
-  };
-
-  const handleCloseDelete = () => {
-    setOpenDelete(false);
-  };
-
   return (
     <>
       <Header />
       <div className="container">
-        <h2>Clases</h2>
+        <h2>Espacios</h2>
         <div style={{ width: "80rem" }}>
           <Tooltip title="Agregar" placement="top">
             <IconButton onClick={handleOpenAdd} aria-label="add">
@@ -122,34 +126,34 @@ const ViewAddClass = () => {
               <TableRow>
                 <TableCell>ID</TableCell>
                 <TableCell align="left">Nombre</TableCell>
-                <TableCell align="left">Disponibilidad</TableCell>
+                <TableCell align="left">Capacidad</TableCell>
                 <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {(rowsPerPage > 0
-                ? Clases.slice(
+                ? spaces.slice(
                     page * rowsPerPage,
                     page * rowsPerPage + rowsPerPage
                   )
-                : Clases
-              ).map((Class) => (
+                : spaces
+              ).map((space) => (
                 <TableRow
-                  key={Class.id}
+                  key={space.id}
                   sx={{ "&:last-child td, &:last-child th": { border: 0 } }}
                 >
                   <TableCell component="th" scope="row">
-                    {Class.id}
+                    {space.id}
                   </TableCell>
-                  <TableCell align="left">{Class.name}</TableCell>
-                  <TableCell align="left">{Class.available}</TableCell>
+                  <TableCell align="left">{space.nombre}</TableCell>
+                  <TableCell align="left">{space.capacidad}</TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">
                       <Tooltip title="Eliminar" placement="top">
                         <IconButton
                           color="error"
                           aria-label="delete"
-                          onClick={() => handleClickOpenDelete(Class)}
+                          onClick={() => handleClickOpenDelete(space)}
                         >
                           <DeleteIcon />
                         </IconButton>
@@ -160,7 +164,7 @@ const ViewAddClass = () => {
                         <IconButton
                           color="success"
                           aria-label="edit"
-                          onClick={() => handleOpenEdit(Class)}
+                          onClick={() => handleOpenEdit(space)}
                         >
                           <EditIcon />
                         </IconButton>
@@ -176,7 +180,7 @@ const ViewAddClass = () => {
           sx={{ width: "80rem" }}
           component="div"
           rowsPerPageOptions={[5, 10, 25]}
-          count={Clases.length}
+          count={spaces.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
@@ -184,27 +188,25 @@ const ViewAddClass = () => {
         />
         <Dialog TransitionProps={{ onEntering: handleEntering }} open={openAdd}>
           <DialogContent>
-            <ModalClass
+            <ModalSpace
               isEdit={false}
-              data={null}
+              space={null}
               handleClose={handleCloseAdd}
             />
           </DialogContent>
         </Dialog>
-
         <Dialog
           TransitionProps={{ onEntering: handleEntering }}
           open={openEdit}
         >
           <DialogContent>
-            <ModalClass
+            <ModalSpace
               isEdit={true}
-              data={ClassEdit}
+              space={spaceEdit}
               handleClose={handleCloseEdit}
             />
           </DialogContent>
         </Dialog>
-
         <Dialog
           open={openDelete}
           onClose={handleCloseDelete}
@@ -212,10 +214,12 @@ const ViewAddClass = () => {
           aria-describedby="alert-dialog-description"
         >
           <DialogTitle id="alert-dialog-title">
-            {"¿Está seguro que desea eliminar la clase?"}
+            {"¿Está seguro que desea eliminar el espacio?"}
           </DialogTitle>
           <DialogActions>
-            <Button color="success">Aceptar</Button>
+            <Button color="success" onClick={handleDelete}>
+              Aceptar
+            </Button>
             <Button color="error" onClick={handleCloseDelete} autoFocus>
               Cancelar
             </Button>
@@ -226,4 +230,4 @@ const ViewAddClass = () => {
   );
 };
 
-export default ViewAddClass;
+export default SpaceTable;

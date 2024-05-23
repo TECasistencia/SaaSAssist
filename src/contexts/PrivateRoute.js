@@ -1,14 +1,15 @@
 import React, { useContext } from "react";
 import { AuthContext } from "./AuthContext";
 import { Navigate, Outlet } from "react-router-dom";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Route } from "react-router-dom";
 
 import ViewCamera from "../components/ViewCamera";
 import ViewDataHistoryClass from "../components/ViewDataHistoryClass";
 import ViewDataHistoryDate from "../components/ViewDataHistoryDate";
 import ViewDataHistoryAG from "../components/ViewDataHistoryAG";
-import ViewAddClases from "../components/ViewAddClases";
+import CursoTable from "../components/CursoTable";
 import ViewClassList from "../components/ViewClassList";
+import PeriodTable from "../components/PeriodTable";
 
 const PrivateRoute = () => {
   const { isAuthenticated, isAdmin, isInvited, isPrincipal } =
@@ -26,7 +27,7 @@ const PrivateRoute = () => {
     // El administrador tiene acceso a las rutas específicas
     return (
       <Outlet>
-        <Route path="/ViewAddClases" element={<ViewAddClases />} />
+        <Route path="/CursoTable" element={<CursoTable />} />
         <Route
           path="/ViewDataHistoryClass"
           element={<ViewDataHistoryClass />}

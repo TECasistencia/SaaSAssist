@@ -1,40 +1,22 @@
-import {
-  Box,
-  Button,
-  FormControl,
-  InputLabel,
-  Select,
-  MenuItem,
-  Dialog,
-  DialogActions,
-  DialogContent,
-  IconButton,
-  TextField,
-  Tooltip,
-  Autocomplete,
-} from "@mui/material";
+import { Box, Button, TextField, Autocomplete } from "@mui/material";
 import { AuthContext } from "../contexts/AuthContext";
-import CloudUploadIcon from "@mui/icons-material/CloudUpload";
-import DescriptionIcon from "@mui/icons-material/Description";
-import DeleteIcon from "@mui/icons-material/Delete";
-import React, { useState, useEffect, useContext } from "react";
-
-import PersonaController from "../serviceApi/personaController";
+import React, { useState, useEffect, useContext, useCallback } from "react";
+import PersonaController from "../serviceApi/PersonaController";
+import UsuarioController from "../serviceApi/UsuarioController";
 import {
   getCountrys,
   getStates,
   getCantones,
   getDistricts,
-} from "../serviceApi/ubicacionController";
-
-import UsuarioController from "../serviceApi/usuarioController";
+} from "../serviceApi/UbicacionController";
 
 const ModalAdmin = ({ isEdit, admin, handleClose }) => {
   const { dataUser, token } = useContext(AuthContext);
-  const [statesOptions, setStatesOptions] = useState();
-  const [countrysOptions, setCountrysOptions] = useState();
-  const [cantonesOptions, setCantonesOptions] = useState();
-  const [districtOptions, setDistrictOptions] = useState();
+
+  const [statesOptions, setStatesOptions] = useState([]);
+  const [countrysOptions, setCountrysOptions] = useState([]);
+  const [cantonesOptions, setCantonesOptions] = useState([]);
+  const [districtOptions, setDistrictOptions] = useState([]);
 
   const optionsActive = [
     { label: "Sí", value: true },
@@ -46,138 +28,70 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
     { id: 3, nombre: "Pasaporte" },
   ];
 
-  const [resultPerson, setResultPerson] = useState("");
-
-  // Obtener la fecha actual en formato ISO (YYYY-MM-DD HH:mm:ss.sssZ)
   const fechaActual = new Date();
-  const fechaFormateada = fechaActual.toLocaleDateString("en-CA"); // 'en-CA' representa el formato 'yyyy-mm-dd'
+  const fechaFormateada = fechaActual.toLocaleDateString("en-CA");
 
   const [dataPerson, setDataPerson] = useState({
-    mail: isEdit ? admin.correo_Electronico : null,
-    typeIdentify: isEdit
-      ? optionsIdentify.find(
-          (option) => option.id === admin.tipo_Identificacion
-        )?.nombre
-      : null,
-    country: null,
-    state: null,
-    canton: null,
-    district: null,
-    firstName: isEdit ? admin.primer_Nombre : null,
-    secondName: isEdit ? admin.segundo_Nombre : null,
-    cellphoneNumber: isEdit ? admin.telefono : null,
-    firstLastName: isEdit ? admin.primer_Apellido : null,
-    secondLastName: isEdit ? admin.segundo_Apellido : null,
-    numberIdentify: isEdit ? admin.numero_Identificacion : null,
-    city: isEdit ? admin.ciudad : null,
-    direction: isEdit ? admin.direccion : null,
-    postalMail: isEdit ? admin.apartado_Postal : null,
+    mail: isEdit ? admin.correo_Electronico : "",
+    typeIdentify: isEdit ? admin.tipo_Identificacion : "",
+    country: isEdit ? admin.iD_Pais : "",
+    state: isEdit ? admin.iD_Estado_Provincia : "",
+    canton: isEdit ? admin.iD_Canton : "",
+    district: isEdit ? admin.iD_Distrito : "",
+    firstName: isEdit ? admin.primer_Nombre : "",
+    secondName: isEdit ? admin.segundo_Nombre : "",
+    cellphoneNumber: isEdit ? admin.telefono : "",
+    firstLastName: isEdit ? admin.primer_Apellido : "",
+    secondLastName: isEdit ? admin.segundo_Apellido : "",
+    numberIdentify: isEdit ? admin.numero_Identificacion : "",
+    city: isEdit ? admin.ciudad : "",
+    direction: isEdit ? admin.direccion : "",
+    postalMail: isEdit ? admin.apartado_Postal : "",
   });
-
-  const obtenerCountrys = async (token) => {
-    try {
-      const dataCountrys = await getCountrys(token);
-      setCountrysOptions(dataCountrys);
-    } catch (error) {
-      console.error("Error al obtener los países:", error);
-    }
-  };
-
-  const obtenerStates = async (countryId, token) => {
-    try {
-      const dataStates = await getStates(countryId, token);
-      setStatesOptions(dataStates);
-    } catch (error) {
-      console.error("Error al obtener los estados o provincias:", error);
-    }
-  };
-
-  const obtenerCantones = async (stateId, token) => {
-    try {
-      const dataCantones = await getCantones(stateId, token);
-      setCantonesOptions(dataCantones);
-    } catch (error) {
-      console.error("Error al obtener los cantones:", error);
-    }
-  };
-
-  const obtenerDistritos = async (cantonId, token) => {
-    try {
-      const dataDistrict = await getDistricts(cantonId, token);
-      setDistrictOptions(dataDistrict);
-    } catch (error) {
-      console.error("Error al obtener los distritos:", error);
-    }
-  };
-
-  useEffect(() => {
-    obtenerCountrys(token);
-
-    if (dataPerson.country) {
-      obtenerStates(dataPerson.country, token);
-    }
-    if (dataPerson.state) {
-      obtenerCantones(dataPerson.state, token);
-    }
-    if (dataPerson.canton) {
-      obtenerDistritos(dataPerson.canton, token);
-    }
-    if (resultPerson !== "") {
-      handleAddUser();
-    }
-  }, [
-    dataPerson.country,
-    dataPerson.state,
-    dataPerson.canton,
-    resultPerson,
-    token,
-  ]);
 
   const [usuario, setUsuario] = useState({
-    idPersona: isEdit ? admin.id : resultPerson,
     idOrganizacion: parseInt(dataUser.IdOrganizacion),
-    nombreUsuario: isEdit ? admin.nombre_Usuario : null,
-    password: isEdit ? admin.password : null,
+    nombreUsuario: isEdit ? admin.nombre_Usuario : "",
+    password: isEdit ? admin.password : "",
     rol: 2,
-    fechaAlta: isEdit ? admin.fecha_Alta : fechaFormateada, // No estoy seguro de dónde obtienes esta fecha, así que la dejé como en tu código original
+    fechaAlta: isEdit ? admin.fecha_Alta : fechaFormateada,
     activo: isEdit
       ? optionsActive.find((option) => option.value === admin.activo)?.label
-      : null,
+      : "",
   });
 
-  const [selectedCountryName, setSelectedCountryName] = useState("");
-  const [selectedStateName, setSelectedStateName] = useState("");
-  const [selectedCantonName, setSelectedCantonName] = useState("");
-  const [selectedDistrictName, setSelectedDistrictName] = useState("");
   const [selectedIdentifyName, setSelectedIdentifyName] = useState("");
   const [selectedActiveName, setSelectedActiveName] = useState("");
   const [currentFieldName, setCurrentFieldName] = useState("");
 
-  const [Images, setImages] = useState(null);
-  const dialogRef = React.useRef(null);
-  const [openSubirImages, setOpenSubirImages] = useState(false);
-  const [urlImages, setUrlImages] = useState("");
-  const [fileNameImages, setFileNameImages] = useState(
-    "No hay archivo seleccionado"
-  );
+  const fetchData = useCallback(async () => {
+    try {
+      const [dataCountrys] = await Promise.all([getCountrys(token)]);
+      setCountrysOptions(dataCountrys);
 
-  const handleOpenSubirImages = () => {
-    setOpenSubirImages(true);
-  };
-  const handleCloseSubirImages = () => {
-    setOpenSubirImages(false);
-    setImages(null);
-    setFileNameImages("No hay archivo seleccionado");
-  };
-
-  const handleEntering = () => {
-    if (dialogRef.current != null) {
-      dialogRef.current.focus();
+      if (dataPerson.country) {
+        const dataStates = await getStates(dataPerson.country, token);
+        setStatesOptions(dataStates);
+      }
+      if (dataPerson.state) {
+        const dataCantones = await getCantones(dataPerson.state, token);
+        setCantonesOptions(dataCantones);
+      }
+      if (dataPerson.canton) {
+        const dataDistrict = await getDistricts(dataPerson.canton, token);
+        setDistrictOptions(dataDistrict);
+      }
+    } catch (error) {
+      console.error("Error al obtener los datos:", error);
     }
-  };
+  }, [dataPerson.country, dataPerson.state, dataPerson.canton, token]);
+
+  useEffect(() => {
+    fetchData();
+  }, [fetchData]);
 
   const handleChangePerson = (e) => {
-    const { name, value } = e.target;
+    const { value } = e.target;
     if (currentFieldName) {
       setDataPerson((prevState) => ({
         ...prevState,
@@ -187,7 +101,7 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
   };
 
   const handleChangeUser = (event) => {
-    const { name, value } = event.target;
+    const { value } = event.target;
     if (currentFieldName) {
       setUsuario({
         ...usuario,
@@ -200,43 +114,34 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
     setCurrentFieldName(fieldName);
   };
 
-  const handleChangeImages = (e) => {
-    const inputValue = e.target.value;
-    setImages(inputValue);
-  };
-
   const handleAdd = async () => {
     try {
-      // Llamar a la función InsertPerson del controlador PersonaController
       const result = await PersonaController.InsertPerson(dataPerson, token);
-      setResultPerson(result.id);
-
-      // Aquí puedes hacer algo después de insertar la persona, como cerrar el modal
+      if (result.id) {
+        const newUser = await UsuarioController.InsertUser(
+          usuario,
+          result.id,
+          token
+        );
+        console.log("Nuevo usuario agregado:", newUser);
+        handleClose();
+      }
     } catch (error) {
       console.error("Error al insertar la persona:", error);
-      // Aquí puedes manejar el error de alguna manera, como mostrando un mensaje al usuario
     }
   };
 
-  const handleAddUser = async () => {
+  const handleEdit = async () => {
     try {
-      // Asegúrate de que resultPerson tenga un valor antes de intentar agregar el usuario
-      if (resultPerson) {
-        // Actualiza el estado del usuario con el nuevo ID de persona
-        setUsuario((prevUsuario) => ({
-          ...prevUsuario,
-          idPersona: resultPerson,
-        }));
-
-        // Llamar a la función InsertarUsuario del controlador de usuario
-        const newUser = await UsuarioController.InsertarUsuario(usuario, token);
-        console.log("Nuevo usuario agregado:", newUser);
-      } else {
-        console.warn("El ID de persona es nulo o vacío.");
-      }
+      const result = await PersonaController.UpdatePerson(
+        dataPerson,
+        admin.id,
+        token
+      );
+      console.log("Se realizo: ", result);
+      handleClose();
     } catch (error) {
-      console.error("Error al agregar el usuario:", error);
-      // Manejar el error
+      console.error("Error al modificar la persona:", error);
     }
   };
 
@@ -249,14 +154,12 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
         sx={{
           width: "100%",
           display: "flex",
-          flexDirection: "row", // Establece la dirección de los elementos en fila
-          flexWrap: "wrap", // Permite que los elementos se envuelvan a la siguiente línea si no caben en el ancho del contenedor
+          flexDirection: "row",
+          flexWrap: "wrap",
           justifyContent: "space-between",
-          // Distribuye los elementos de manera uniforme a lo largo del contenedor
-          "& > div": { width: "48%" }, // Establece el ancho de cada columna
-
-          "& .MuiTextField-root": { m: 0.5, width: "100%" }, // Ancho completo para TextField
-          "& .MuiFormControl-root": { m: 0.5, width: "100%" }, // Ancho completo para FormControl
+          "& > div": { width: "48%" },
+          "& .MuiTextField-root": { m: 0.5, width: "100%" },
+          "& .MuiFormControl-root": { m: 0.5, width: "100%" },
         }}
         noValidate
         autoComplete="off"
@@ -309,19 +212,32 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
             />
 
             <Autocomplete
-              value={selectedIdentifyName || dataPerson.typeIdentify} // Utilizamos la variable temporal para el nombre
+              value={
+                isEdit
+                  ? optionsIdentify.find(
+                      (option) => option.id === admin.tipo_Identificacion
+                    )?.nombre
+                  : selectedIdentifyName
+              }
               onChange={(event, value) => {
                 const selectedIdentify = optionsIdentify.find(
                   (identify) => identify.nombre === value
                 );
                 if (selectedIdentify) {
-                  setSelectedIdentifyName(selectedIdentify.nombre); // Almacenamos el nombre
+                  setSelectedIdentifyName(selectedIdentify.nombre);
                   setDataPerson({
                     ...dataPerson,
-                    typeIdentify: selectedIdentify.id, // Almacenamos el ID
+                    typeIdentify: selectedIdentify.id,
+                  });
+                } else {
+                  setSelectedIdentifyName("");
+                  setDataPerson({
+                    ...dataPerson,
+                    typeIdentify: "",
                   });
                 }
               }}
+              isOptionEqualToValue={(option, value) => option.nombre === value}
               options={
                 optionsIdentify
                   ? optionsIdentify.map((option) => option.nombre)
@@ -345,19 +261,28 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
             />
 
             <Autocomplete
-              value={selectedCountryName} // Utilizamos la variable temporal para el nombre
+              value={
+                countrysOptions.find(
+                  (option) => option.id === dataPerson.country
+                )?.nombre || ""
+              }
               onChange={(event, value) => {
                 const selectedCountry = countrysOptions.find(
                   (country) => country.nombre === value
                 );
                 if (selectedCountry) {
-                  setSelectedCountryName(selectedCountry.nombre); // Almacenamos el nombre
                   setDataPerson({
                     ...dataPerson,
-                    country: selectedCountry.id, // Almacenamos el ID
+                    country: selectedCountry.id,
+                  });
+                } else {
+                  setDataPerson({
+                    ...dataPerson,
+                    country: "",
                   });
                 }
               }}
+              isOptionEqualToValue={(option, value) => option.nombre === value}
               options={
                 countrysOptions
                   ? countrysOptions.map((option) => option.nombre)
@@ -376,19 +301,27 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
         <div>
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             <Autocomplete
-              value={selectedStateName} // Utilizamos la variable temporal para el nombre
+              value={
+                statesOptions.find((option) => option.id === dataPerson.state)
+                  ?.nombre || ""
+              }
               onChange={(event, value) => {
                 const selectedState = statesOptions.find(
                   (state) => state.nombre === value
                 );
                 if (selectedState) {
-                  setSelectedStateName(selectedState.nombre); // Almacenamos el nombre
                   setDataPerson({
                     ...dataPerson,
-                    state: selectedState.id, // Almacenamos el ID
+                    state: selectedState.id,
+                  });
+                } else {
+                  setDataPerson({
+                    ...dataPerson,
+                    state: "",
                   });
                 }
               }}
+              isOptionEqualToValue={(option, value) => option.nombre === value}
               options={
                 statesOptions
                   ? statesOptions.map((option) => option.nombre)
@@ -403,19 +336,28 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
               )}
             />
             <Autocomplete
-              value={selectedCantonName} // Utilizamos la variable temporal para el nombre
+              value={
+                cantonesOptions.find(
+                  (option) => option.id === dataPerson.canton
+                )?.nombre || ""
+              }
               onChange={(event, value) => {
                 const selectedCanton = cantonesOptions.find(
                   (canton) => canton.nombre === value
                 );
                 if (selectedCanton) {
-                  setSelectedCantonName(selectedCanton.nombre); // Almacenamos el nombre
                   setDataPerson({
                     ...dataPerson,
-                    canton: selectedCanton.id, // Almacenamos el ID
+                    canton: selectedCanton.id,
+                  });
+                } else {
+                  setDataPerson({
+                    ...dataPerson,
+                    canton: "",
                   });
                 }
               }}
+              isOptionEqualToValue={(option, value) => option.nombre === value}
               options={
                 cantonesOptions
                   ? cantonesOptions.map((option) => option.nombre)
@@ -431,19 +373,28 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
             />
 
             <Autocomplete
-              value={selectedDistrictName} // Utilizamos la variable temporal para el nombre
+              value={
+                districtOptions.find(
+                  (option) => option.id === dataPerson.district
+                )?.nombre || ""
+              }
               onChange={(event, value) => {
                 const selectedDistrict = districtOptions.find(
                   (district) => district.nombre === value
                 );
                 if (selectedDistrict) {
-                  setSelectedDistrictName(selectedDistrict.nombre); // Almacenamos el nombre
                   setDataPerson({
                     ...dataPerson,
-                    district: selectedDistrict.id, // Almacenamos el ID
+                    district: selectedDistrict.id,
+                  });
+                } else {
+                  setDataPerson({
+                    ...dataPerson,
+                    district: "",
                   });
                 }
               }}
+              isOptionEqualToValue={(option, value) => option.nombre === value}
               options={
                 districtOptions
                   ? districtOptions.map((option) => option.nombre)
@@ -523,106 +474,17 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
             />
 
             <div className="button-container">
-              <Button sx={{ mt: 2 }} onClick={handleAdd}>
+              <Button sx={{ mt: 2 }} onClick={isEdit ? handleEdit : handleAdd}>
                 {isEdit ? "Editar" : "Crear"}
               </Button>
+
               <Button sx={{ mt: 2 }} color="error" onClick={handleClose}>
                 Cancelar
               </Button>
             </div>
           </Box>
         </div>
-        {/*  
-          <div className="logo-pagina">
-            <h3>Imagenes del sujeto</h3>
-            <div className="logo-box">
-              <img
-                style={{ maxWidth: "500px", borderRadius: "5px" }}
-                src={urlImages !== "" ? urlImages : ""}
-                alt=""
-              />
-            </div>
-            <Button
-              variant="outlined"
-              sx={{ mt: "1rem", width: "10rem" }}
-              onClick={handleOpenSubirImages}
-            >
-              Subir Imagenes
-            </Button>
-          </div>
-          <br />
-          */}
       </Box>
-      {/*
-      <Dialog
-        TransitionProps={{ onEntering: handleEntering }}
-        open={openSubirImages}
-      >
-        <DialogContent>
-          <div className="logo-pagina">
-            <h3>Imágenes a subir</h3>
-            <form
-              className="form-logo"
-              action=""
-              onClick={() => document.querySelector(".input-logo").click()}
-            >
-              <input
-                className="input-logo"
-                type="file"
-                accept="image/*"
-                hidden
-                onClick={(event) => {
-                  event.target.value = null;
-                }}
-                onChange={({ target: { files } }) => {
-                  files[0] && setFileNameImages(files[0].name);
-                  if (files) {
-                    setImages(files[0]);
-                  }
-                }}
-              />
-              {Images ? (
-                <img
-                  style={{ maxWidth: "500px", borderRadius: "5px" }}
-                  src={URL.createObjectURL(Images)}
-                  alt={fileNameImages}
-                />
-              ) : (
-                <>
-                  <CloudUploadIcon
-                    color="primary"
-                    sx={{ width: 40, height: 40 }}
-                  />
-                  <p>Subir un archivo</p>
-                </>
-              )}
-            </form>
-            <section className="uploaded-row">
-              <DescriptionIcon color="primary" />
-              <span>{fileNameImages}</span>
-              <IconButton
-                color="error"
-                aria-label="delete"
-                onClick={() => {
-                  setFileNameImages("No hay archivo seleccionado");
-                  setImages(null);
-                }}
-              >
-                <Tooltip title="Eliminar erchivo seleccionado" placement="top">
-                  <DeleteIcon />
-                </Tooltip>
-              </IconButton>
-            </section>
-          </div>
-        </DialogContent>
-        <DialogActions>
-          <Button color="success">Guardar Imágenes</Button>
-          <Button color="error" onClick={handleCloseSubirImages} autoFocus>
-            Cancelar
-          </Button>
-        </DialogActions>
-      </Dialog>
-              */}
     </div>
   );
 };

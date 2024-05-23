@@ -34,8 +34,16 @@ function CustomMenu() {
             to: "/Admins",
           },
           {
-            label: "Clases",
-            to: "/ViewAddClases",
+            label: "Espacios",
+            to: "/SpaceTable",
+          },
+          {
+            label: "Periodos",
+            to: "/PeriodTable",
+          },
+          {
+            label: "Cursos",
+            to: "/CursoTable",
           },
           {
             label: "Asignar clases",
@@ -50,8 +58,8 @@ function CustomMenu() {
     ...(isPrincipal || isAdmin
       ? [
           {
-            label: "Usuarios",
-            to: "/Users",
+            label: "Alumnos",
+            to: "/StudentTable",
           },
           {
             label: "Historial de datos",
