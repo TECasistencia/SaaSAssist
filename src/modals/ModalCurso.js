@@ -63,6 +63,7 @@ const ModalCurso = ({ isEdit, data, handleClose }) => {
             periodId: edicion.idPeriodo,
             fechaInicio: edicion.fechaInicio,
             fechaFin: edicion.fechaFin,
+            edicionId: edicion.id,
           }));
         }
       } catch (error) {
@@ -107,6 +108,19 @@ const ModalCurso = ({ isEdit, data, handleClose }) => {
       let newCourse;
       if (isEdit) {
         newCourse = await CursoController.UpdateCurso(courseData, token);
+        const updatedEdicionCurso = {
+          Id: courseData.edicionId,
+          IdCurso: courseData.id,
+          IdPeriodo: courseData.periodId,
+          IdEspacio: courseData.spaceId,
+          NombreGrupo: courseData.nombre,
+          FechaInicio: courseData.fechaInicio,
+          FechaFin: courseData.fechaFin,
+        };
+        await EdicionCursoController.UpdateEdicionCurso(
+          updatedEdicionCurso,
+          token
+        );
       } else {
         newCourse = await CursoController.InsertCurso(courseData, token);
         const newEdicionCurso = {
