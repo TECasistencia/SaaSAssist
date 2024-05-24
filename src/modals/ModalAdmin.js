@@ -55,18 +55,14 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
     password: isEdit ? admin.password : "",
     rol: 2,
     fechaAlta: isEdit ? admin.fecha_Alta : fechaFormateada,
-    activo: isEdit
-      ? optionsActive.find((option) => option.value === admin.activo)?.label
-      : "",
+    activo: isEdit ? admin.activo : "",
   });
 
-  const [selectedIdentifyName, setSelectedIdentifyName] = useState("");
-  const [selectedActiveName, setSelectedActiveName] = useState("");
   const [currentFieldName, setCurrentFieldName] = useState("");
 
   const fetchData = useCallback(async () => {
     try {
-      const [dataCountrys] = await Promise.all([getCountrys(token)]);
+      const dataCountrys = await getCountrys(token);
       setCountrysOptions(dataCountrys);
 
       if (dataPerson.country) {
@@ -103,10 +99,10 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
   const handleChangeUser = (event) => {
     const { value } = event.target;
     if (currentFieldName) {
-      setUsuario({
-        ...usuario,
+      setUsuario((prevState) => ({
+        ...prevState,
         [currentFieldName]: value,
-      });
+      }));
     }
   };
 
@@ -213,36 +209,22 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
 
             <Autocomplete
               value={
-                isEdit
-                  ? optionsIdentify.find(
-                      (option) => option.id === admin.tipo_Identificacion
-                    )?.nombre
-                  : selectedIdentifyName
+                optionsIdentify.find(
+                  (option) => option.id === dataPerson.typeIdentify
+                ) || null
               }
               onChange={(event, value) => {
                 const selectedIdentify = optionsIdentify.find(
-                  (identify) => identify.nombre === value
+                  (identify) => identify.id === value?.id
                 );
-                if (selectedIdentify) {
-                  setSelectedIdentifyName(selectedIdentify.nombre);
-                  setDataPerson({
-                    ...dataPerson,
-                    typeIdentify: selectedIdentify.id,
-                  });
-                } else {
-                  setSelectedIdentifyName("");
-                  setDataPerson({
-                    ...dataPerson,
-                    typeIdentify: "",
-                  });
-                }
+                setDataPerson({
+                  ...dataPerson,
+                  typeIdentify: selectedIdentify ? selectedIdentify.id : "",
+                });
               }}
-              isOptionEqualToValue={(option, value) => option.nombre === value}
-              options={
-                optionsIdentify
-                  ? optionsIdentify.map((option) => option.nombre)
-                  : []
-              }
+              isOptionEqualToValue={(option, value) => option.id === value?.id}
+              options={optionsIdentify}
+              getOptionLabel={(option) => option.nombre || ""}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -264,30 +246,20 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
               value={
                 countrysOptions.find(
                   (option) => option.id === dataPerson.country
-                )?.nombre || ""
+                ) || null
               }
               onChange={(event, value) => {
                 const selectedCountry = countrysOptions.find(
-                  (country) => country.nombre === value
+                  (country) => country.id === value?.id
                 );
-                if (selectedCountry) {
-                  setDataPerson({
-                    ...dataPerson,
-                    country: selectedCountry.id,
-                  });
-                } else {
-                  setDataPerson({
-                    ...dataPerson,
-                    country: "",
-                  });
-                }
+                setDataPerson({
+                  ...dataPerson,
+                  country: selectedCountry ? selectedCountry.id : "",
+                });
               }}
-              isOptionEqualToValue={(option, value) => option.nombre === value}
-              options={
-                countrysOptions
-                  ? countrysOptions.map((option) => option.nombre)
-                  : []
-              }
+              isOptionEqualToValue={(option, value) => option.id === value?.id}
+              options={countrysOptions}
+              getOptionLabel={(option) => option.nombre || ""}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -302,31 +274,22 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
           <Box sx={{ display: "flex", flexDirection: "column" }}>
             <Autocomplete
               value={
-                statesOptions.find((option) => option.id === dataPerson.state)
-                  ?.nombre || ""
+                statesOptions.find(
+                  (option) => option.id === dataPerson.state
+                ) || null
               }
               onChange={(event, value) => {
                 const selectedState = statesOptions.find(
-                  (state) => state.nombre === value
+                  (state) => state.id === value?.id
                 );
-                if (selectedState) {
-                  setDataPerson({
-                    ...dataPerson,
-                    state: selectedState.id,
-                  });
-                } else {
-                  setDataPerson({
-                    ...dataPerson,
-                    state: "",
-                  });
-                }
+                setDataPerson({
+                  ...dataPerson,
+                  state: selectedState ? selectedState.id : "",
+                });
               }}
-              isOptionEqualToValue={(option, value) => option.nombre === value}
-              options={
-                statesOptions
-                  ? statesOptions.map((option) => option.nombre)
-                  : []
-              }
+              isOptionEqualToValue={(option, value) => option.id === value?.id}
+              options={statesOptions}
+              getOptionLabel={(option) => option.nombre || ""}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -339,30 +302,20 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
               value={
                 cantonesOptions.find(
                   (option) => option.id === dataPerson.canton
-                )?.nombre || ""
+                ) || null
               }
               onChange={(event, value) => {
                 const selectedCanton = cantonesOptions.find(
-                  (canton) => canton.nombre === value
+                  (canton) => canton.id === value?.id
                 );
-                if (selectedCanton) {
-                  setDataPerson({
-                    ...dataPerson,
-                    canton: selectedCanton.id,
-                  });
-                } else {
-                  setDataPerson({
-                    ...dataPerson,
-                    canton: "",
-                  });
-                }
+                setDataPerson({
+                  ...dataPerson,
+                  canton: selectedCanton ? selectedCanton.id : "",
+                });
               }}
-              isOptionEqualToValue={(option, value) => option.nombre === value}
-              options={
-                cantonesOptions
-                  ? cantonesOptions.map((option) => option.nombre)
-                  : []
-              }
+              isOptionEqualToValue={(option, value) => option.id === value?.id}
+              options={cantonesOptions}
+              getOptionLabel={(option) => option.nombre || ""}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -376,30 +329,20 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
               value={
                 districtOptions.find(
                   (option) => option.id === dataPerson.district
-                )?.nombre || ""
+                ) || null
               }
               onChange={(event, value) => {
                 const selectedDistrict = districtOptions.find(
-                  (district) => district.nombre === value
+                  (district) => district.id === value?.id
                 );
-                if (selectedDistrict) {
-                  setDataPerson({
-                    ...dataPerson,
-                    district: selectedDistrict.id,
-                  });
-                } else {
-                  setDataPerson({
-                    ...dataPerson,
-                    district: "",
-                  });
-                }
+                setDataPerson({
+                  ...dataPerson,
+                  district: selectedDistrict ? selectedDistrict.id : "",
+                });
               }}
-              isOptionEqualToValue={(option, value) => option.nombre === value}
-              options={
-                districtOptions
-                  ? districtOptions.map((option) => option.nombre)
-                  : []
-              }
+              isOptionEqualToValue={(option, value) => option.id === value?.id}
+              options={districtOptions}
+              getOptionLabel={(option) => option.nombre || ""}
               renderInput={(params) => (
                 <TextField
                   {...params}
@@ -448,22 +391,25 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
             />
 
             <Autocomplete
-              value={selectedActiveName || usuario.activo} // Utilizamos la variable temporal para el nombre
-              onChange={(event, value) => {
-                const selectedActiveName = optionsActive.find(
-                  (active) => active.label === value
-                );
-                if (selectedActiveName) {
-                  setSelectedActiveName(selectedActiveName.label); // Almacenamos el nombre
-                  setUsuario({
-                    ...usuario,
-                    activo: selectedActiveName.value,
-                  });
-                }
-              }}
-              options={
-                optionsActive ? optionsActive.map((option) => option.label) : []
+              value={
+                optionsActive.find(
+                  (option) => option.value === usuario.activo
+                ) || null
               }
+              onChange={(event, value) => {
+                const selectedActive = optionsActive.find(
+                  (active) => active.value === value?.value
+                );
+                setUsuario({
+                  ...usuario,
+                  activo: selectedActive ? selectedActive.value : "",
+                });
+              }}
+              isOptionEqualToValue={(option, value) =>
+                option.value === value?.value
+              }
+              options={optionsActive}
+              getOptionLabel={(option) => option.label || ""}
               renderInput={(params) => (
                 <TextField
                   {...params}

@@ -16,7 +16,7 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
   const [countrysOptions, setCountrysOptions] = useState([]);
   const [cantonesOptions, setCantonesOptions] = useState([]);
   const [districtOptions, setDistrictOptions] = useState([]);
-  const [selectedIdentifyName, setSelectedIdentifyName] = useState("");
+  const [selectedIdentifyName, setSelectedIdentifyName] = useState(null);
   const [currentFieldName, setCurrentFieldName] = useState("");
 
   const optionsIdentify = [
@@ -36,12 +36,12 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
     secondName: isEdit ? student.segundo_Nombre : "",
     firstLastName: isEdit ? student.primer_Apellido : "",
     secondLastName: isEdit ? student.segundo_Apellido : "",
-    typeIdentify: isEdit ? student.tipo_Identificacion : "",
+    typeIdentify: isEdit ? student.tipo_Identificacion : null,
     numberIdentify: isEdit ? student.numero_Identificacion : "",
-    country: isEdit ? student.id_Pais : "",
-    state: isEdit ? student.id_Estado_Provincia : "",
-    canton: isEdit ? student.id_Canton : "",
-    district: isEdit ? student.id_Distrito : "",
+    country: isEdit ? student.id_Pais : null,
+    state: isEdit ? student.id_Estado_Provincia : null,
+    canton: isEdit ? student.id_Canton : null,
+    district: isEdit ? student.id_Distrito : null,
     city: isEdit ? student.ciudad : "",
     direction: isEdit ? student.direccion : "",
     postalMail: isEdit ? student.apartado_Postal : "",
@@ -51,7 +51,7 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
 
   const fetchData = useCallback(async () => {
     try {
-      const [dataCountrys] = await Promise.all([getCountrys(token)]);
+      const dataCountrys = await getCountrys(token);
       setCountrysOptions(dataCountrys);
 
       if (personData.country) {
@@ -128,6 +128,7 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
   const handleFocus = (fieldName) => {
     setCurrentFieldName(fieldName);
   };
+
   return (
     <div className="container-modal">
       <h2>{isEdit ? "Editar un alumno" : "Agregar un alumno"}</h2>
@@ -175,36 +176,22 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
           />
           <Autocomplete
             value={
-              isEdit
-                ? optionsIdentify.find(
-                    (option) => option.id === personData.typeIdentify
-                  )?.nombre
-                : selectedIdentifyName
+              optionsIdentify.find(
+                (option) => option.id === personData.typeIdentify
+              ) || null
             }
             onChange={(event, value) => {
               const selectedIdentify = optionsIdentify.find(
-                (identify) => identify.nombre === value
+                (identify) => identify.id === value?.id
               );
-              if (selectedIdentify) {
-                setSelectedIdentifyName(selectedIdentify.nombre);
-                setPersonData({
-                  ...personData,
-                  typeIdentify: selectedIdentify.id,
-                });
-              } else {
-                setSelectedIdentifyName("");
-                setPersonData({
-                  ...personData,
-                  typeIdentify: "",
-                });
-              }
+              setPersonData({
+                ...personData,
+                typeIdentify: selectedIdentify ? selectedIdentify.id : null,
+              });
             }}
-            isOptionEqualToValue={(option, value) => option.nombre === value}
-            options={
-              optionsIdentify
-                ? optionsIdentify.map((option) => option.nombre)
-                : []
-            }
+            isOptionEqualToValue={(option, value) => option.id === value?.id}
+            options={optionsIdentify}
+            getOptionLabel={(option) => option.nombre || ""}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -223,31 +210,22 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
           />
           <Autocomplete
             value={
-              countrysOptions.find((option) => option.id === personData.country)
-                ?.nombre || ""
+              countrysOptions.find(
+                (option) => option.id === personData.country
+              ) || null
             }
             onChange={(event, value) => {
               const selectedCountry = countrysOptions.find(
-                (country) => country.nombre === value
+                (country) => country.id === value?.id
               );
-              if (selectedCountry) {
-                setPersonData({
-                  ...personData,
-                  country: selectedCountry.id,
-                });
-              } else {
-                setPersonData({
-                  ...personData,
-                  country: "",
-                });
-              }
+              setPersonData({
+                ...personData,
+                country: selectedCountry ? selectedCountry.id : null,
+              });
             }}
-            isOptionEqualToValue={(option, value) => option.nombre === value}
-            options={
-              countrysOptions
-                ? countrysOptions.map((option) => option.nombre)
-                : []
-            }
+            isOptionEqualToValue={(option, value) => option.id === value?.id}
+            options={countrysOptions}
+            getOptionLabel={(option) => option.nombre || ""}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -258,29 +236,21 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
           />
           <Autocomplete
             value={
-              statesOptions.find((option) => option.id === personData.state)
-                ?.nombre || ""
+              statesOptions.find((option) => option.id === personData.state) ||
+              null
             }
             onChange={(event, value) => {
               const selectedState = statesOptions.find(
-                (state) => state.nombre === value
+                (state) => state.id === value?.id
               );
-              if (selectedState) {
-                setPersonData({
-                  ...personData,
-                  state: selectedState.id,
-                });
-              } else {
-                setPersonData({
-                  ...personData,
-                  state: "",
-                });
-              }
+              setPersonData({
+                ...personData,
+                state: selectedState ? selectedState.id : null,
+              });
             }}
-            isOptionEqualToValue={(option, value) => option.nombre === value}
-            options={
-              statesOptions ? statesOptions.map((option) => option.nombre) : []
-            }
+            isOptionEqualToValue={(option, value) => option.id === value?.id}
+            options={statesOptions}
+            getOptionLabel={(option) => option.nombre || ""}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -291,31 +261,22 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
           />
           <Autocomplete
             value={
-              cantonesOptions.find((option) => option.id === personData.canton)
-                ?.nombre || ""
+              cantonesOptions.find(
+                (option) => option.id === personData.canton
+              ) || null
             }
             onChange={(event, value) => {
               const selectedCanton = cantonesOptions.find(
-                (canton) => canton.nombre === value
+                (canton) => canton.id === value?.id
               );
-              if (selectedCanton) {
-                setPersonData({
-                  ...personData,
-                  canton: selectedCanton.id,
-                });
-              } else {
-                setPersonData({
-                  ...personData,
-                  canton: "",
-                });
-              }
+              setPersonData({
+                ...personData,
+                canton: selectedCanton ? selectedCanton.id : null,
+              });
             }}
-            isOptionEqualToValue={(option, value) => option.nombre === value}
-            options={
-              cantonesOptions
-                ? cantonesOptions.map((option) => option.nombre)
-                : []
-            }
+            isOptionEqualToValue={(option, value) => option.id === value?.id}
+            options={cantonesOptions}
+            getOptionLabel={(option) => option.nombre || ""}
             renderInput={(params) => (
               <TextField
                 {...params}
@@ -328,30 +289,20 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
             value={
               districtOptions.find(
                 (option) => option.id === personData.district
-              )?.nombre || ""
+              ) || null
             }
             onChange={(event, value) => {
               const selectedDistrict = districtOptions.find(
-                (district) => district.nombre === value
+                (district) => district.id === value?.id
               );
-              if (selectedDistrict) {
-                setPersonData({
-                  ...personData,
-                  district: selectedDistrict.id,
-                });
-              } else {
-                setPersonData({
-                  ...personData,
-                  district: "",
-                });
-              }
+              setPersonData({
+                ...personData,
+                district: selectedDistrict ? selectedDistrict.id : null,
+              });
             }}
-            isOptionEqualToValue={(option, value) => option.nombre === value}
-            options={
-              districtOptions
-                ? districtOptions.map((option) => option.nombre)
-                : []
-            }
+            isOptionEqualToValue={(option, value) => option.id === value?.id}
+            options={districtOptions}
+            getOptionLabel={(option) => option.nombre || ""}
             renderInput={(params) => (
               <TextField
                 {...params}
