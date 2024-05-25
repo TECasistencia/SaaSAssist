@@ -2,7 +2,6 @@ import { BACKEND } from "../serviceApi/Backend";
 
 const CursoController = {
   InsertCurso: async (curso, token) => {
-    console.log(curso);
     try {
       const response = await fetch(BACKEND + "Curso/Insertar", {
         method: "POST",
@@ -13,7 +12,7 @@ const CursoController = {
         body: JSON.stringify({
           idOrganizacion: curso.idOrganizacion,
           codigoCurso: curso.codigoCurso,
-          nombre: curso.name,
+          nombre: curso.nombre,
           nombreVariante: curso.nombreVariante,
           descripcion: curso.descripcion,
         }),

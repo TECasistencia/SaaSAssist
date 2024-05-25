@@ -15,12 +15,14 @@ import {
   TableRow,
   Tooltip,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import Header from "./Header";
 import ModalGuest from "../modals/ModalGuest";
+import UsuarioController from "../serviceApi/UsuarioController"; // Importa el controlador donde está getUsers
+import { AuthContext } from "../contexts/AuthContext";
 
 const GuestTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -28,59 +30,29 @@ const GuestTable = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
-  const [guestEdit, setGuestEdit] = useState();
-
+  const [guestEdit, setGuestEdit] = useState(null);
+  const [guests, setGuests] = useState([]);
+  const { token } = useContext(AuthContext);
   const dialogRef = React.useRef(null);
 
-  const Guests = [
-    {
-      id: "1",
-      name: "Hugo",
-      lastName: "Perez Chavarria",
-      mail: "hugo@asrt.com",
-      pass: "123",
-    },
-    {
-      id: "2",
-      name: "Fernando",
-      lastName: "Castillo",
-      mail: "fercas@ast.com",
-      pass: "adr",
-    },
-    {
-      id: "3",
-      name: "Adriana",
-      lastName: "Gonzalez Jara",
-      mail: "adri@ast.com",
-      pass: "esd",
-    },
-    {
-      id: "4",
-      name: "Rodrigo",
-      lastName: "Perez Chavarria",
-      mail: "rod@asrt.com",
-      pass: "rer",
-    },
-    {
-      id: "5",
-      name: "Carlos",
-      lastName: "Castillo",
-      mail: "carlos@ast.com",
-      pass: "wer",
-    },
-    {
-      id: "6",
-      name: "Samanta",
-      lastName: "Gonzalez Jara",
-      mail: "samgon@ast.com",
-      pass: "rte",
-    },
-  ];
+  useEffect(() => {
+    const fetchGuests = async () => {
+      try {
+        const guestData = await UsuarioController.getUsers(3, token);
+        setGuests(guestData);
+      } catch (error) {
+        console.error("Error fetching guests:", error);
+      }
+    };
+
+    fetchGuests();
+  }, [token]);
 
   const handleOpenEdit = (guest) => {
     setGuestEdit(guest);
     setOpenEdit(true);
   };
+
   const handleCloseEdit = () => {
     setOpenEdit(false);
   };
@@ -92,9 +64,11 @@ const GuestTable = () => {
   const handleCloseAdd = () => {
     setOpenAdd(false);
   };
+
   const handleChangePage = (event, newPage) => {
     setPage(newPage);
   };
+
   const handleChangeRowsPerPage = (event) => {
     setRowsPerPage(parseInt(event.target.value, 10));
     setPage(0);
@@ -107,7 +81,7 @@ const GuestTable = () => {
   };
 
   const handleClickOpenDelete = (guest) => {
-    // logica para eliminar el guest seleccionado
+    // lógica para eliminar el guest seleccionado
     setOpenDelete(true);
   };
 
@@ -136,17 +110,16 @@ const GuestTable = () => {
                 <TableCell align="left">Nombre</TableCell>
                 <TableCell align="left">Apellidos</TableCell>
                 <TableCell align="left">Correo</TableCell>
-                <TableCell align="left">Contraseña</TableCell>
                 <TableCell align="right">Acciones</TableCell>
               </TableRow>
             </TableHead>
             <TableBody>
               {(rowsPerPage > 0
-                ? Guests.slice(
+                ? guests.slice(
                     page * rowsPerPage,
                     page * rowsPerPage + rowsPerPage
                   )
-                : Guests
+                : guests
               ).map((guest) => (
                 <TableRow
                   key={guest.id}
@@ -158,7 +131,6 @@ const GuestTable = () => {
                   <TableCell align="left">{guest.name}</TableCell>
                   <TableCell align="left">{guest.lastName}</TableCell>
                   <TableCell align="left">{guest.mail}</TableCell>
-                  <TableCell align="left">{guest.pass}</TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">
                       <Tooltip title="Eliminar" placement="top">
@@ -192,7 +164,7 @@ const GuestTable = () => {
           sx={{ width: "70rem" }}
           component="div"
           rowsPerPageOptions={[5, 10, 25]}
-          count={Guests.length}
+          count={guests.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
