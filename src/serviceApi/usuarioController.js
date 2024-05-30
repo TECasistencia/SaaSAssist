@@ -3,9 +3,35 @@ import { BACKEND } from "./Backend";
 
 const UsuarioController = {
   InsertUser: async (usuario, id, token) => {
+    console.log(usuario, id);
     try {
       // Generar el hash de la contraseña
-      const hashedPassword = await bcrypt.hash(usuario.password, 10); // 10 es el número de rondas de cifrado
+      const hashedPassword = await bcrypt.hash(usuario.password, 10);
+
+      let body;
+      if (usuario.rol === 3) {
+        body = JSON.stringify({
+          idPersona: id,
+          idOrganizacion: usuario.idOrganizacion,
+          idAlumno: usuario.idAlumno,
+          nombreUsuario: usuario.nombreUsuario,
+          password: hashedPassword,
+          rol: usuario.rol,
+          fechaAlta: usuario.fechaAlta,
+          activo: usuario.activo,
+        });
+      } else {
+        body = JSON.stringify({
+          idPersona: id,
+          idOrganizacion: usuario.idOrganizacion,
+          nombreUsuario: usuario.nombreUsuario,
+          password: hashedPassword,
+          rol: usuario.rol,
+          fechaAlta: usuario.fechaAlta,
+          activo: usuario.activo,
+        });
+      }
+
       // Realizar la solicitud POST al backend
       const response = await fetch(BACKEND + "Usuario/Insertar", {
         method: "POST",
@@ -13,15 +39,7 @@ const UsuarioController = {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({
-          idPersona: id,
-          idOrganizacion: usuario.idOrganizacion,
-          nombreUsuario: usuario.nombreUsuario,
-          password: hashedPassword, // Utilizar el hash de la contraseña en lugar de la contraseña en texto plano
-          rol: usuario.rol,
-          fechaAlta: usuario.fechaAlta,
-          activo: usuario.activo,
-        }),
+        body: body,
       });
 
       // Manejar la respuesta del servidor
@@ -36,6 +54,7 @@ const UsuarioController = {
       throw error;
     }
   },
+
   DeleteUser: async (nombreUsuario, token) => {
     try {
       const response = await fetch(
@@ -60,6 +79,7 @@ const UsuarioController = {
       throw error;
     }
   },
+
   getUsers: async (Rol, token) => {
     try {
       const response = await fetch(
@@ -72,13 +92,36 @@ const UsuarioController = {
       );
 
       if (!response.ok) {
-        throw new Error("Error al insertar la persona");
+        throw new Error("Error al obtener los usuarios");
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Error al insertar la persona:", error);
+      console.error("Error al obtener los usuarios:", error);
+      throw error;
+    }
+  },
+
+  getUserById: async (idUsuario, token) => {
+    try {
+      const response = await fetch(
+        `${BACKEND}Usuario/ObtenerPorId?idUsuario=${idUsuario}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al obtener el usuario");
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error al obtener el usuario:", error);
       throw error;
     }
   },

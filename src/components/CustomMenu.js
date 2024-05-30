@@ -8,25 +8,26 @@ import MenuIcon from "@mui/icons-material/Menu";
 import { Link } from "react-router-dom";
 
 function CustomMenu() {
-  const [anchorEl, setAnchorEl] = useState(null); // Estado para controlar la apertura del menú
+  const [anchorEl, setAnchorEl] = useState(null);
   const { isAdmin, isInvited, isPrincipal } = useContext(AuthContext);
 
-  // Función para manejar el clic en el botón de menú
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
   };
 
-  // Función para cerrar el menú
   const handleClose = () => {
     setAnchorEl(null);
   };
 
-  // Define los elementos del menú
   const menuItems = [
-    {
-      label: "Inicio",
-      to: "/",
-    },
+    ...(isAdmin || isPrincipal
+      ? [
+          {
+            label: "Inicio",
+            to: "/",
+          },
+        ]
+      : []),
     ...(isPrincipal
       ? [
           {
@@ -42,36 +43,28 @@ function CustomMenu() {
             to: "/PeriodTable",
           },
           {
-            label: "Cursos",
-            to: "/CursoTable",
-          },
-          {
-            label: "Asignar clases",
-            to: "/ViewAsigClasesProfesor",
-          },
-          {
             label: "Cámaras",
             to: "/ViewAddCamera",
+          },
+          {
+            label: "Alumnos",
+            to: "/StudentTable",
+          },
+          {
+            label: "Invitados",
+            to: "/Guests",
           },
         ]
       : []),
     ...(isPrincipal || isAdmin
       ? [
           {
-            label: "Alumnos",
-            to: "/StudentTable",
+            label: "Cursos",
+            to: "/CursoTable",
           },
           {
             label: "Historial de datos",
             to: "/ViewDataHistoryClass",
-          },
-          {
-            label: "Lista de alumnos",
-            to: "/ViewClassList",
-          },
-          {
-            label: "Invitados",
-            to: "/Guests",
           },
         ]
       : []),

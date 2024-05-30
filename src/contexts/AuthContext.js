@@ -17,25 +17,21 @@ const AuthProvider = ({ children }) => {
 
     switch (rol) {
       case 1:
-        console.log("Es principal");
         setIsPrincipal(true);
         setIsAdmin(false);
         setIsInvited(false);
         break;
       case 2:
-        console.log("Es administrador");
         setIsPrincipal(false);
         setIsAdmin(true);
         setIsInvited(false);
         break;
       case 3:
-        console.log("Es invitado");
         setIsPrincipal(false);
         setIsAdmin(false);
         setIsInvited(true);
         break;
       default:
-        console.log("Rol no reconocido");
         setIsPrincipal(false);
         setIsAdmin(false);
         setIsInvited(false);
@@ -64,7 +60,6 @@ const AuthProvider = ({ children }) => {
       const data = await response.json();
 
       const token = data.token;
-      console.log(token);
       setToken(token);
 
       const decodedToken = jwtDecode(token);

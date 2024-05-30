@@ -3,7 +3,6 @@ import { BACKEND } from "../serviceApi/Backend";
 const EspacioController = {
   InsertSpace: async (space, token) => {
     try {
-      console.log(space);
       const response = await fetch(BACKEND + "Espacio/Insertar", {
         method: "POST",
         headers: {
@@ -13,7 +12,7 @@ const EspacioController = {
         body: JSON.stringify({
           IdOrganizacion: space.idOrganizacion,
           nombre: space.name,
-          capacidad: parseInt(space.capacity),
+          capacidad: space.capacity,
         }),
       });
 

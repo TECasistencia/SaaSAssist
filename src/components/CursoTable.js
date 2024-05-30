@@ -23,7 +23,11 @@ import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
 import Header from "./Header";
 import ModalCurso from "../modals/ModalCurso";
+import ModalAsignarProfesor from "../modals/ModalAsignarProfesor";
+import ModalAssignStudents from "../modals/ModalAssignStudents"; // Importar el nuevo modal
 import CursoController from "../serviceApi/CursoController";
+import EdicionCursoController from "../serviceApi/EdicionCursoController";
+import UsuarioController from "../serviceApi/UsuarioController";
 import { AuthContext } from "../contexts/AuthContext";
 
 const CursoTable = () => {
@@ -32,6 +36,8 @@ const CursoTable = () => {
   const [openDelete, setOpenDelete] = useState(false);
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
+  const [openAssignProfessor, setOpenAssignProfessor] = useState(false);
+  const [openAssignStudents, setOpenAssignStudents] = useState(false); // Estado para el nuevo modal
   const [ClassEdit, setClassEdit] = useState();
   const [Cursos, setCursos] = useState([]);
   const { dataUser, token } = useContext(AuthContext);
@@ -44,7 +50,34 @@ const CursoTable = () => {
         dataUser.IdOrganizacion,
         token
       );
-      setCursos(fetchedCursos);
+
+      const admins = await UsuarioController.getUsers(2, token); // Asumiendo que el rol de administrador es 2
+
+      const cursosConEdiciones = await Promise.all(
+        fetchedCursos.map(async (curso) => {
+          const edicionCurso = await EdicionCursoController.GetEdicionCurso(
+            curso.id,
+            token
+          ).catch(() => []); // Asegura que `edicionCurso` sea un arreglo vacío si falla
+
+          const admin =
+            edicionCurso.length > 0
+              ? admins.find(
+                  (admin) => admin.id_Persona === edicionCurso[0].idPersona
+                )
+              : null;
+
+          return {
+            ...curso,
+            edicionCurso: edicionCurso.length > 0 ? edicionCurso[0] : null,
+            nombreAdmin: admin
+              ? `${admin.primer_Nombre} ${admin.segundo_Nombre} ${admin.primer_Apellido} ${admin.segundo_Apellido}`
+              : "N/A",
+          };
+        })
+      );
+
+      setCursos(cursosConEdiciones);
     } catch (error) {
       console.error("Error fetching cursos:", error);
     }
@@ -108,13 +141,21 @@ const CursoTable = () => {
   };
 
   const handleAssignProfessor = (curso) => {
-    // Lógica para asignar un profesor
-    console.log("Asignar profesor al curso:", curso);
+    setClassEdit(curso); // Guarda los datos del curso en el estado
+    setOpenAssignProfessor(true); // Abre el modal para asignar profesor
   };
 
-  const handleSelectStudents = (curso) => {
-    // Lógica para seleccionar alumnos
-    console.log("Seleccionar alumnos para el curso:", curso);
+  const handleCloseAssignProfessor = () => {
+    setOpenAssignProfessor(false);
+  };
+
+  const handleAssignStudents = (curso) => {
+    setClassEdit(curso); // Guarda los datos del curso en el estado
+    setOpenAssignStudents(true); // Abre el modal para asignar alumnos
+  };
+
+  const handleCloseAssignStudents = () => {
+    setOpenAssignStudents(false);
   };
 
   return (
@@ -136,6 +177,8 @@ const CursoTable = () => {
                 <TableCell align="center">ID</TableCell>
                 <TableCell align="left">Nombre</TableCell>
                 <TableCell align="left">Código del Curso</TableCell>
+                <TableCell align="left">Nombre Edición</TableCell>
+                <TableCell align="left">Profesor asignado</TableCell>
                 <TableCell align="center">Acciones</TableCell>
               </TableRow>
             </TableHead>
@@ -156,12 +199,27 @@ const CursoTable = () => {
                   </TableCell>
                   <TableCell align="left">{curso.nombre}</TableCell>
                   <TableCell align="left">{curso.codigoCurso}</TableCell>
+                  <TableCell align="left">
+                    {curso.edicionCurso
+                      ? curso.edicionCurso.nombreGrupo
+                      : "N/A"}
+                  </TableCell>
+                  <TableCell align="left">
+                    {curso.nombreAdmin ? curso.nombreAdmin : "N/A"}
+                  </TableCell>
                   <TableCell
                     align="center"
                     sx={{ display: "flex", justifyContent: "center" }}
                   >
                     <div className="action-btn">
-                      <Tooltip title="Asignar Profesor" placement="top">
+                      <Tooltip
+                        title={
+                          curso.edicionCurso && curso.edicionCurso.idUsuario
+                            ? "Editar Profesor"
+                            : "Asignar Profesor"
+                        }
+                        placement="top"
+                      >
                         <IconButton
                           color="primary"
                           aria-label="assign-professor"
@@ -176,7 +234,7 @@ const CursoTable = () => {
                         <IconButton
                           color="secondary"
                           aria-label="select-students"
-                          onClick={() => handleSelectStudents(curso)}
+                          onClick={() => handleAssignStudents(curso)}
                         >
                           <GroupAddIcon />
                         </IconButton>
@@ -260,6 +318,30 @@ const CursoTable = () => {
               Cancelar
             </Button>
           </DialogActions>
+        </Dialog>
+
+        <Dialog
+          TransitionProps={{ onEntering: handleEntering }}
+          open={openAssignProfessor}
+        >
+          <DialogContent>
+            <ModalAsignarProfesor
+              curso={ClassEdit}
+              handleClose={handleCloseAssignProfessor}
+            />
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          TransitionProps={{ onEntering: handleEntering }}
+          open={openAssignStudents}
+        >
+          <DialogContent>
+            <ModalAssignStudents
+              idEdicionCurso={ClassEdit?.edicionCurso?.id || null}
+              handleClose={handleCloseAssignStudents}
+            />
+          </DialogContent>
         </Dialog>
       </div>
     </>
