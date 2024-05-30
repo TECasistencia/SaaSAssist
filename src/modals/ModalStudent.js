@@ -97,7 +97,6 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
         personData,
         token
       );
-      console.log(personResponse.id);
       if (personResponse.id) {
         const newStudentData = {
           ...studentData,
@@ -110,12 +109,11 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
       console.error("Error al insertar el alumno:", error);
     }
   };
-
   const handleEdit = async () => {
     try {
       await PersonaController.UpdatePerson(
         personData,
-        studentData.id_Persona,
+        student.id_Persona,
         token
       );
       await AlumnoController.UpdateAlumno(studentData, token);

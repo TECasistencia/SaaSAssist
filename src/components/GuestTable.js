@@ -15,13 +15,14 @@ import {
   TableRow,
   Tooltip,
 } from "@mui/material";
-import React, { useState, useEffect, useContext } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
 import Header from "./Header";
 import ModalGuest from "../modals/ModalGuest";
-import UsuarioController from "../serviceApi/UsuarioController"; // Importa el controlador donde está getUsers
+import UsuarioController from "../serviceApi/UsuarioController";
+import PersonaController from "../serviceApi/PersonaController";
 import { AuthContext } from "../contexts/AuthContext";
 
 const GuestTable = () => {
@@ -32,21 +33,22 @@ const GuestTable = () => {
   const [openEdit, setOpenEdit] = useState(false);
   const [guestEdit, setGuestEdit] = useState(null);
   const [guests, setGuests] = useState([]);
+  const [guestToDelete, setGuestToDelete] = useState(null);
   const { token } = useContext(AuthContext);
   const dialogRef = React.useRef(null);
 
-  useEffect(() => {
-    const fetchGuests = async () => {
-      try {
-        const guestData = await UsuarioController.getUsers(3, token);
-        setGuests(guestData);
-      } catch (error) {
-        console.error("Error fetching guests:", error);
-      }
-    };
-
-    fetchGuests();
+  const fetchGuests = useCallback(async () => {
+    try {
+      const guestData = await UsuarioController.getUsers(3, token);
+      setGuests(guestData);
+    } catch (error) {
+      console.error("Error fetching guests:", error);
+    }
   }, [token]);
+
+  useEffect(() => {
+    fetchGuests();
+  }, [fetchGuests]);
 
   const handleOpenEdit = (guest) => {
     setGuestEdit(guest);
@@ -81,12 +83,37 @@ const GuestTable = () => {
   };
 
   const handleClickOpenDelete = (guest) => {
-    // lógica para eliminar el guest seleccionado
+    setGuestToDelete(guest);
     setOpenDelete(true);
+  };
+
+  const handleConfirmDelete = async () => {
+    try {
+      const result = await PersonaController.DeletePerson(
+        guestToDelete.id,
+        token
+      );
+      if (result) {
+        try {
+          const confirm = await UsuarioController.DeleteUser(
+            guestToDelete.nombre_Usuario,
+            token
+          );
+          setOpenDelete(false);
+          setGuestToDelete(null);
+          fetchGuests();
+        } catch (error) {
+          console.error("Error: ", error);
+        }
+      }
+    } catch (error) {
+      console.error("Error deleting guest:", error);
+    }
   };
 
   const handleCloseDelete = () => {
     setOpenDelete(false);
+    setGuestToDelete(null);
   };
 
   return (
@@ -128,9 +155,9 @@ const GuestTable = () => {
                   <TableCell component="th" scope="row">
                     {guest.id}
                   </TableCell>
-                  <TableCell align="left">{guest.name}</TableCell>
-                  <TableCell align="left">{guest.lastName}</TableCell>
-                  <TableCell align="left">{guest.mail}</TableCell>
+                  <TableCell align="left">{guest.primer_Nombre}</TableCell>
+                  <TableCell align="left">{guest.primer_Apellido}</TableCell>
+                  <TableCell align="left">{guest.correo_Electronico}</TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">
                       <Tooltip title="Eliminar" placement="top">
@@ -176,6 +203,7 @@ const GuestTable = () => {
               isEdit={false}
               guest={null}
               handleClose={handleCloseAdd}
+              fetchGuests={fetchGuests} // Pasa fetchGuests como prop
             />
           </DialogContent>
         </Dialog>
@@ -189,6 +217,7 @@ const GuestTable = () => {
               isEdit={true}
               guest={guestEdit}
               handleClose={handleCloseEdit}
+              fetchGuests={fetchGuests} // Pasa fetchGuests como prop
             />
           </DialogContent>
         </Dialog>
@@ -203,7 +232,9 @@ const GuestTable = () => {
             {"¿Está seguro que desea eliminar el invitado?"}
           </DialogTitle>
           <DialogActions>
-            <Button color="success">Aceptar</Button>
+            <Button color="success" onClick={handleConfirmDelete}>
+              Aceptar
+            </Button>
             <Button color="error" onClick={handleCloseDelete} autoFocus>
               Cancelar
             </Button>

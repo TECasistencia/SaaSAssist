@@ -1,6 +1,6 @@
 import { Box, Button, TextField, Autocomplete } from "@mui/material";
-import { AuthContext } from "../contexts/AuthContext";
 import React, { useState, useEffect, useContext, useCallback } from "react";
+import { AuthContext } from "../contexts/AuthContext";
 import PersonaController from "../serviceApi/PersonaController";
 import UsuarioController from "../serviceApi/UsuarioController";
 import {
@@ -11,7 +11,7 @@ import {
 } from "../serviceApi/UbicacionController";
 import AlumnoController from "../serviceApi/AlumnoController";
 
-const ModalGuest = ({ isEdit, guest, handleClose }) => {
+const ModalGuest = ({ isEdit, guest, handleClose, fetchGuests }) => {
   const { dataUser, token } = useContext(AuthContext);
 
   const [statesOptions, setStatesOptions] = useState([]);
@@ -19,6 +19,7 @@ const ModalGuest = ({ isEdit, guest, handleClose }) => {
   const [cantonesOptions, setCantonesOptions] = useState([]);
   const [districtOptions, setDistrictOptions] = useState([]);
   const [alumnosOptions, setAlumnosOptions] = useState([]);
+  const [selectedAlumno, setSelectedAlumno] = useState(null);
 
   const optionsActive = [
     { label: "Sí", value: true },
@@ -34,31 +35,31 @@ const ModalGuest = ({ isEdit, guest, handleClose }) => {
   const fechaFormateada = fechaActual.toLocaleDateString("en-CA");
 
   const [dataPerson, setDataPerson] = useState({
-    mail: isEdit ? guest.correo_Electronico : "",
-    typeIdentify: isEdit ? guest.tipo_Identificacion : "",
-    country: isEdit ? guest.iD_Pais : "",
-    state: isEdit ? guest.iD_Estado_Provincia : "",
-    canton: isEdit ? guest.iD_Canton : "",
-    district: isEdit ? guest.iD_Distrito : "",
-    firstName: isEdit ? guest.primer_Nombre : "",
-    secondName: isEdit ? guest.segundo_Nombre : "",
-    cellphoneNumber: isEdit ? guest.telefono : "",
-    firstLastName: isEdit ? guest.primer_Apellido : "",
-    secondLastName: isEdit ? guest.segundo_Apellido : "",
-    numberIdentify: isEdit ? guest.numero_Identificacion : "",
-    city: isEdit ? guest.ciudad : "",
-    direction: isEdit ? guest.direccion : "",
-    postalMail: isEdit ? guest.apartado_Postal : "",
+    mail: isEdit && guest ? guest.correo_Electronico : "",
+    typeIdentify: isEdit && guest ? guest.tipo_Identificacion : "",
+    country: isEdit && guest ? guest.iD_Pais : "",
+    state: isEdit && guest ? guest.iD_Estado_Provincia : "",
+    canton: isEdit && guest ? guest.iD_Canton : "",
+    district: isEdit && guest ? guest.iD_Distrito : "",
+    firstName: isEdit && guest ? guest.primer_Nombre : "",
+    secondName: isEdit && guest ? guest.segundo_Nombre : "",
+    cellphoneNumber: isEdit && guest ? guest.telefono : "",
+    firstLastName: isEdit && guest ? guest.primer_Apellido : "",
+    secondLastName: isEdit && guest ? guest.segundo_Apellido : "",
+    numberIdentify: isEdit && guest ? guest.numero_Identificacion : "",
+    city: isEdit && guest ? guest.ciudad : "",
+    direction: isEdit && guest ? guest.direccion : "",
+    postalMail: isEdit && guest ? guest.apartado_Postal : "",
   });
 
   const [usuario, setUsuario] = useState({
     idOrganizacion: parseInt(dataUser.IdOrganizacion),
-    nombreUsuario: isEdit ? guest.nombre_Usuario : "",
-    password: isEdit ? guest.password : "",
+    nombreUsuario: isEdit && guest ? guest.nombre_Usuario : "",
+    password: isEdit && guest ? guest.password : "",
     rol: 3,
-    fechaAlta: isEdit ? guest.fecha_Alta : fechaFormateada,
-    activo: isEdit ? guest.activo : "",
-    idAlumno: isEdit ? guest.idAlumno : null,
+    fechaAlta: isEdit && guest ? guest.fecha_Alta : fechaFormateada,
+    activo: isEdit && guest ? guest.activo : "",
+    idAlumno: isEdit && guest ? guest.iD_Alumno : null,
   });
 
   const [currentFieldName, setCurrentFieldName] = useState("");
@@ -67,12 +68,6 @@ const ModalGuest = ({ isEdit, guest, handleClose }) => {
     try {
       const dataCountrys = await getCountrys(token);
       setCountrysOptions(dataCountrys);
-
-      const dataAlumnos = await AlumnoController.GetAlumnos(
-        usuario.idOrganizacion,
-        token
-      );
-      setAlumnosOptions(dataAlumnos);
 
       if (dataPerson.country) {
         const dataStates = await getStates(dataPerson.country, token);
@@ -86,6 +81,23 @@ const ModalGuest = ({ isEdit, guest, handleClose }) => {
         const dataDistrict = await getDistricts(dataPerson.canton, token);
         setDistrictOptions(dataDistrict);
       }
+
+      const dataAlumnos = await AlumnoController.GetAlumnos(
+        dataUser.IdOrganizacion,
+        token
+      );
+      setAlumnosOptions(dataAlumnos);
+
+      if (isEdit && guest && guest.iD_Alumno) {
+        const selectedAlumno = dataAlumnos.find(
+          (alumno) => alumno.id === guest.iD_Alumno
+        );
+        setSelectedAlumno(selectedAlumno);
+        setUsuario((prevState) => ({
+          ...prevState,
+          idAlumno: selectedAlumno ? selectedAlumno.id : null,
+        }));
+      }
     } catch (error) {
       console.error("Error al obtener los datos:", error);
     }
@@ -93,8 +105,10 @@ const ModalGuest = ({ isEdit, guest, handleClose }) => {
     dataPerson.country,
     dataPerson.state,
     dataPerson.canton,
+    dataUser.IdOrganizacion,
     token,
-    usuario.idOrganizacion,
+    isEdit,
+    guest,
   ]);
 
   useEffect(() => {
@@ -134,7 +148,7 @@ const ModalGuest = ({ isEdit, guest, handleClose }) => {
           result.id,
           token
         );
-        console.log("Nuevo usuario agregado:", newUser);
+        fetchGuests();
         handleClose();
       }
     } catch (error) {
@@ -149,22 +163,11 @@ const ModalGuest = ({ isEdit, guest, handleClose }) => {
         guest.id,
         token
       );
-      console.log("Se realizo: ", result);
+      fetchGuests();
       handleClose();
     } catch (error) {
       console.error("Error al modificar la persona:", error);
     }
-  };
-
-  const formatAlumnoNombre = (alumno) => {
-    return [
-      alumno.primer_Nombre,
-      alumno.segundo_Nombre,
-      alumno.primer_Apellido,
-      alumno.segundo_Apellido,
-    ]
-      .filter(Boolean)
-      .join(" ");
   };
 
   return (
@@ -446,15 +449,12 @@ const ModalGuest = ({ isEdit, guest, handleClose }) => {
             />
 
             <Autocomplete
-              value={
-                alumnosOptions.find(
-                  (option) => option.id === usuario.idAlumno
-                ) || null
-              }
+              value={selectedAlumno || null}
               onChange={(event, value) => {
                 const selectedAlumno = alumnosOptions.find(
                   (alumno) => alumno.id === value?.id
                 );
+                setSelectedAlumno(selectedAlumno);
                 setUsuario({
                   ...usuario,
                   idAlumno: selectedAlumno ? selectedAlumno.id : null,
@@ -462,7 +462,12 @@ const ModalGuest = ({ isEdit, guest, handleClose }) => {
               }}
               isOptionEqualToValue={(option, value) => option.id === value?.id}
               options={alumnosOptions}
-              getOptionLabel={(option) => formatAlumnoNombre(option) || ""}
+              getOptionLabel={(option) => {
+                const fullName = `${option.primer_Nombre} ${
+                  option.segundo_Nombre ? option.segundo_Nombre + " " : ""
+                }${option.primer_Apellido} ${option.segundo_Apellido}`;
+                return fullName;
+              }}
               renderInput={(params) => (
                 <TextField
                   {...params}

@@ -92,13 +92,36 @@ const UsuarioController = {
       );
 
       if (!response.ok) {
-        throw new Error("Error al insertar la persona");
+        throw new Error("Error al obtener los usuarios");
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Error al insertar la persona:", error);
+      console.error("Error al obtener los usuarios:", error);
+      throw error;
+    }
+  },
+
+  getUserById: async (idUsuario, token) => {
+    try {
+      const response = await fetch(
+        `${BACKEND}Usuario/ObtenerPorId?idUsuario=${idUsuario}`,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al obtener el usuario");
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error al obtener el usuario:", error);
       throw error;
     }
   },

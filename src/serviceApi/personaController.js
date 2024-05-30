@@ -35,7 +35,6 @@ const PersonaController = {
       }
 
       const data = await response.json();
-      console.log(data);
       return data;
     } catch (error) {
       console.error("Error al insertar la persona:", error);
@@ -45,6 +44,7 @@ const PersonaController = {
 
   UpdatePerson: async (person, id, token) => {
     try {
+      console.log(person, id);
       const response = await fetch(BACKEND + "Persona/Modificar", {
         method: "POST",
         headers: {
@@ -73,7 +73,8 @@ const PersonaController = {
       });
 
       if (!response.ok) {
-        throw new Error("Error al modificar la persona");
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.error || "Error al modificar la persona");
       }
 
       const data = await response.json();
@@ -83,6 +84,7 @@ const PersonaController = {
       throw error;
     }
   },
+
   DeletePerson: async (id, token) => {
     try {
       const response = await fetch(BACKEND + "Persona/Eliminar?id=" + id, {
@@ -94,7 +96,8 @@ const PersonaController = {
       });
 
       if (!response.ok) {
-        throw new Error("Error al eliminar la persona");
+        const errorResponse = await response.json();
+        throw new Error(errorResponse.error || "Error al eliminar la persona");
       }
 
       const data = await response.json();
