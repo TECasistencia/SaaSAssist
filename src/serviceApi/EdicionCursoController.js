@@ -80,7 +80,6 @@ const EdicionCursoController = {
 
   UpdateEdicionCurso: async (id, edicionCurso, token) => {
     try {
-      console.log(edicionCurso);
       const response = await fetch(BACKEND + "EdicionCurso/Modificar", {
         method: "POST",
         headers: {
