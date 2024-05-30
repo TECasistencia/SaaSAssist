@@ -75,7 +75,7 @@ const AlumnoController = {
   UpdateAlumno: async (student, token) => {
     try {
       const response = await fetch(BACKEND + "Alumno/Modificar", {
-        method: "POST",
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

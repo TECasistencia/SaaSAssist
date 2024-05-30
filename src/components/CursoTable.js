@@ -21,10 +21,12 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
+import VideoCallIcon from "@mui/icons-material/VideoCall"; // Importar el nuevo ícono
 import Header from "./Header";
 import ModalCurso from "../modals/ModalCurso";
 import ModalAsignarProfesor from "../modals/ModalAsignarProfesor";
-import ModalAssignStudents from "../modals/ModalAssignStudents"; // Importar el nuevo modal
+import ModalAssignStudents from "../modals/ModalAssignStudents";
+import ModalAssignVideoStudent from "../modals/ModalAssignVideoStudent"; // Importar el nuevo modal
 import CursoController from "../serviceApi/CursoController";
 import EdicionCursoController from "../serviceApi/EdicionCursoController";
 import UsuarioController from "../serviceApi/UsuarioController";
@@ -37,7 +39,8 @@ const CursoTable = () => {
   const [openAdd, setOpenAdd] = useState(false);
   const [openEdit, setOpenEdit] = useState(false);
   const [openAssignProfessor, setOpenAssignProfessor] = useState(false);
-  const [openAssignStudents, setOpenAssignStudents] = useState(false); // Estado para el nuevo modal
+  const [openAssignStudents, setOpenAssignStudents] = useState(false);
+  const [openAssignVideoStudents, setOpenAssignVideoStudents] = useState(false); // Estado para el nuevo modal
   const [ClassEdit, setClassEdit] = useState();
   const [Cursos, setCursos] = useState([]);
   const { dataUser, token } = useContext(AuthContext);
@@ -158,6 +161,15 @@ const CursoTable = () => {
     setOpenAssignStudents(false);
   };
 
+  const handleAssignVideoStudents = (curso) => {
+    setClassEdit(curso); // Guarda los datos del curso en el estado
+    setOpenAssignVideoStudents(true); // Abre el modal para asignar videos a los alumnos
+  };
+
+  const handleCloseAssignVideoStudents = () => {
+    setOpenAssignVideoStudents(false);
+  };
+
   return (
     <>
       <Header />
@@ -237,6 +249,17 @@ const CursoTable = () => {
                           onClick={() => handleAssignStudents(curso)}
                         >
                           <GroupAddIcon />
+                        </IconButton>
+                      </Tooltip>
+                    </div>
+                    <div className="action-btn">
+                      <Tooltip title="Asignar Videos" placement="top">
+                        <IconButton
+                          color="secondary"
+                          aria-label="assign-videos"
+                          onClick={() => handleAssignVideoStudents(curso)}
+                        >
+                          <VideoCallIcon />
                         </IconButton>
                       </Tooltip>
                     </div>
@@ -340,6 +363,18 @@ const CursoTable = () => {
             <ModalAssignStudents
               idEdicionCurso={ClassEdit?.edicionCurso?.id || null}
               handleClose={handleCloseAssignStudents}
+            />
+          </DialogContent>
+        </Dialog>
+
+        <Dialog
+          TransitionProps={{ onEntering: handleEntering }}
+          open={openAssignVideoStudents}
+        >
+          <DialogContent>
+            <ModalAssignVideoStudent
+              idEdicionCurso={ClassEdit?.edicionCurso?.id || null}
+              handleClose={handleCloseAssignVideoStudents}
             />
           </DialogContent>
         </Dialog>
