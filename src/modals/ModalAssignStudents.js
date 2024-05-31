@@ -12,8 +12,6 @@ import {
   Paper,
   TableContainer,
   TablePagination,
-  Toolbar,
-  Typography,
   InputAdornment,
   IconButton,
   Dialog,
@@ -134,29 +132,24 @@ const ModalAssignStudents = ({ idEdicionCurso, handleClose }) => {
           noValidate
           autoComplete="off"
         >
+          <TextField
+            variant="outlined"
+            size="small"
+            placeholder="Buscar Alumno"
+            value={searchQuery}
+            onChange={handleSearchChange}
+            InputProps={{
+              startAdornment: (
+                <InputAdornment position="start">
+                  <IconButton>
+                    <SearchIcon />
+                  </IconButton>
+                </InputAdornment>
+              ),
+            }}
+            sx={{ mb: 2, width: "80%", alignSelf: "center" }}
+          />
           <TableContainer component={Paper} sx={{ width: "100%" }}>
-            <Toolbar sx={{ justifyContent: "center" }}>
-              <Typography variant="h6" id="tableTitle" component="div">
-                Alumnos
-              </Typography>
-            </Toolbar>
-            <TextField
-              variant="outlined"
-              size="small"
-              placeholder="Buscar Alumno"
-              value={searchQuery}
-              onChange={handleSearchChange}
-              InputProps={{
-                startAdornment: (
-                  <InputAdornment position="start">
-                    <IconButton>
-                      <SearchIcon />
-                    </IconButton>
-                  </InputAdornment>
-                ),
-              }}
-              sx={{ mb: 2, width: "80%", alignSelf: "center" }}
-            />
             <Table stickyHeader aria-label="sticky table">
               <TableHead>
                 <TableRow>

@@ -44,9 +44,8 @@ const PersonaController = {
 
   UpdatePerson: async (person, id, token) => {
     try {
-      console.log(person, id);
       const response = await fetch(BACKEND + "Persona/Modificar", {
-        method: "POST",
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
