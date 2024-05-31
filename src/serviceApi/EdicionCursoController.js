@@ -81,7 +81,7 @@ const EdicionCursoController = {
   UpdateEdicionCurso: async (id, edicionCurso, token) => {
     try {
       const response = await fetch(BACKEND + "EdicionCurso/Modificar", {
-        method: "POST",
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

@@ -56,7 +56,7 @@ const EspacioController = {
   UpdateSpace: async (space, token) => {
     try {
       const response = await fetch(BACKEND + `Espacio/Modificar`, {
-        method: "POST",
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",

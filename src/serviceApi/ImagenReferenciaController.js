@@ -9,11 +9,20 @@ const ImagenReferenciaController = {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
         },
-        body: JSON.stringify(imagenReferencia),
+        body: JSON.stringify({
+          idPersona: imagenReferencia[0].IdPersona,
+          rutaArchivo: imagenReferencia[0].RutaArchivo,
+          fechaCarga: imagenReferencia[0].FechaCarga,
+          usadaParaEntrenamiento: imagenReferencia[0].Usado,
+        }),
       });
 
       if (!response.ok) {
         const errorResponse = await response.json();
+        console.error(
+          "Error al insertar la imagen de referencia:",
+          errorResponse
+        );
         throw new Error(
           errorResponse.error || "Error al insertar la imagen de referencia"
         );

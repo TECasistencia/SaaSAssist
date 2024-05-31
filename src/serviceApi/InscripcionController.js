@@ -79,7 +79,7 @@ const InscripcionController = {
   UpdateInscripcion: async (inscripcion, token) => {
     try {
       const response = await fetch(BACKEND + "Inscripcion/Modificar", {
-        method: "POST",
+        method: "PUT",
         headers: {
           Authorization: `Bearer ${token}`,
           "Content-Type": "application/json",
