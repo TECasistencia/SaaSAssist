@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import Box from "@mui/material/Box";
@@ -7,6 +7,7 @@ import CameraCard from "./CameraCard";
 import StartCamera from "../modals/StartCamera";
 import { Button, Dialog, DialogActions, DialogContent } from "@mui/material";
 import { Link } from "react-router-dom";
+import FaceRecognitionController from "../serviceApi/FaceRecognitionController";
 
 const initialCameras = [
   { title: "Cámara 1", estado: "Offline" },
@@ -18,10 +19,41 @@ function PageInicio() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedCameraTitle, setSelectedCameraTitle] = useState("");
   const [cameras, setCameras] = useState(initialCameras);
+  const [response, setResponse] = useState("");
+  const [error, setError] = useState("");
+  const [image, setImage] = useState(null);
 
   const handleCardClick = (title) => {
     setSelectedCameraTitle(title);
     setIsModalOpen(true);
+  };
+
+  const runFaceRecognitionScript = async () => {
+    try {
+      await FaceRecognitionController.RunScriptFaceRecognition();
+    } catch (error) {
+      console.error(
+        "Error al ejecutar el script de reconocimiento facial: ",
+        error
+      );
+    }
+  };
+  const handleRunScript = async () => {
+    try {
+      const data = {
+        Arg1: "Hola",
+        Arg2: "Buenas",
+        Arg3: "Juan",
+      };
+      const response = await FaceRecognitionController.RunScriptExtractImages(
+        data
+      );
+      setResponse(response.result);
+      setError("");
+    } catch (error) {
+      setError(error.message);
+      setResponse("");
+    }
   };
 
   const handleClose = () => {
@@ -54,6 +86,21 @@ function PageInicio() {
     setIsModalOpen(false);
   };
 
+  useEffect(() => {
+    const fetchImage = async () => {
+      try {
+        const imageUrl = await FaceRecognitionController.GetLatestImage();
+        setImage(imageUrl);
+      } catch (error) {
+        console.error("Error fetching the image: ", error);
+      }
+    };
+
+    const interval = setInterval(fetchImage, 10000); // Fetch every 10 seconds
+    fetchImage(); // Fetch immediately on mount
+
+    return () => clearInterval(interval); // Clean up interval on unmount
+  }, []);
   return (
     <div>
       <Header />
@@ -68,6 +115,17 @@ function PageInicio() {
               />
             </Grid>
           ))}
+          <Button
+            variant="outlined"
+            sx={{ height: "3rem", alignSelf: "center" }}
+            onClick={runFaceRecognitionScript}
+          >
+            Test
+          </Button>
+          <div>
+            <h1>Reconocimiento Facial</h1>
+            {image && <img src={image} alt="Reconocimiento Facial" />}
+          </div>
         </Grid>
       </Box>
 
