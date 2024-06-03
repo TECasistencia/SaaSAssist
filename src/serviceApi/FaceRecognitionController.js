@@ -1,29 +1,22 @@
 import { BACKEND } from "../serviceApi/Backend";
 
 const FaceRecognitionController = {
-  RunScriptExtractImages: async (data) => {
+
+  RunScriptTrainModel: async (data) => {
     try {
-      const response = await fetch(
-        BACKEND + "FaceRecognition/RunScriptExtractImages",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({
-            Arg1: data.Arg1,
-            Arg2: data.Arg2,
-            Arg3: data.Arg3,
-          }),
-        }
-      );
+      const response = await fetch(BACKEND + "FaceRecognition/TrainModel", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
 
       if (!response.ok) {
         const errorData = await response.json();
         throw new Error(`Error al ejecutar el script: ${errorData.errors}`);
       } else {
-        const data = await response.json();
-        return data;
+        return await response.json();
       }
     } catch (error) {
       console.error("Error de conexión con el servidor: ", error);
@@ -31,12 +24,19 @@ const FaceRecognitionController = {
     }
   },
 
-  RunScriptFaceRecognition: async () => {
+  RunScriptFaceRecognition: async (data) => {
     try {
       const response = await fetch(
-        BACKEND + "FaceRecognition/RunScriptFaceRecognition",
+        BACKEND + "FaceRecognition/RunFaceRecognition",
         {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            idCurso: data.idCurso,
+            cameraIndex: data.cameraIndex,
+          }),
         }
       );
 
@@ -55,12 +55,19 @@ const FaceRecognitionController = {
     }
   },
 
-  RunScriptFaceRecognitionCNN: async () => {
+  RunScriptFaceRecognitionCNN: async (data) => {
     try {
       const response = await fetch(
-        BACKEND + "FaceRecognition/RunScriptFaceRecognitionCNN",
+        BACKEND + "FaceRecognition/RunFaceRecognitionCNN",
         {
           method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            idCurso: data.idCurso,
+            cameraIndex: data.cameraIndex,
+          }),
         }
       );
 
