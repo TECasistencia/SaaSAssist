@@ -1,36 +1,183 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useContext, useCallback } from "react";
 import {
   Box,
-  MenuItem,
   FormControl,
   FormLabel,
   Typography,
+  Autocomplete,
   TextField,
+  Button,
 } from "@mui/material";
 import "../styles/styleStartCamera.css";
+import CursoController from "../serviceApi/CursoController";
+import EdicionCursoController from "../serviceApi/EdicionCursoController";
+import InscripcionController from "../serviceApi/InscripcionController";
+import UsuarioController from "../serviceApi/UsuarioController";
+import EspacioController from "../serviceApi/EspacioController";
+import PeriodoController from "../serviceApi/PeriodoController";
+import { AuthContext } from "../contexts/AuthContext";
 
-function StartCamera({ cameraTitle, professorName }) {
-  const [selectedOption, setSelectedOption] = useState("");
-  const [selectedClassroom, setSelectedClassroom] = useState("");
+function StartCamera({ cameraTitle, onStart, handleClose }) {
+  const { dataUser, token } = useContext(AuthContext);
+  const [courseOptions, setCourseOptions] = useState([]);
+  const [courseInfo, setCourseInfo] = useState({
+    IdCurso: "",
+    NombreCurso: "",
+    IdProfesor: "",
+    NombreProfesor: "",
+    IdEspacio: "",
+    NombreEspacio: "",
+    IdPeriodo: "",
+    NombrePeriodo: "",
+    IdOrganizacion: "",
+    IdEdicionCurso: "",
+    Alumnos: [],
+  });
 
-  const options = [
-    { value: "opcion1", label: "Introducción a la Programación" },
-    { value: "opcion2", label: "QA" },
-    { value: "opcion3", label: "Diseño de Software" },
-  ];
+  const fetchCursos = useCallback(async () => {
+    try {
+      const cursos = await CursoController.GetCursos(
+        dataUser.IdOrganizacion,
+        token
+      );
 
-  const classrooms = [
-    { value: "Aula 101", label: "Aula 101" },
-    { value: "Aula 102", label: "Aula 102" },
-    { value: "Aula 103", label: "Aula 103" },
-  ];
+      const fetchedUsers = await UsuarioController.getUsers(2, token);
+      const fetchedSpaces = await EspacioController.GetSpaces(
+        dataUser.IdOrganizacion,
+        token
+      );
+      const fetchedPeriods = await PeriodoController.GetPeriods(
+        dataUser.IdOrganizacion,
+        token
+      );
 
-  const handleOptionChange = (event) => {
-    setSelectedOption(event.target.value);
+      const cursosConEdicionesYInscripciones = await Promise.all(
+        cursos.map(async (curso) => {
+          try {
+            const edicionCursos = await EdicionCursoController.GetEdicionCurso(
+              curso.id,
+              token
+            );
+
+            const edicionesConInscripciones = await Promise.all(
+              edicionCursos.map(async (edicion) => {
+                try {
+                  const inscripciones =
+                    await InscripcionController.SearchInscripcion(
+                      edicion.id,
+                      token
+                    );
+
+                  const usuario = fetchedUsers.find(
+                    (user) => user.id === edicion.idUsuario
+                  );
+
+                  const espacio = fetchedSpaces.find(
+                    (space) => space.id === edicion.idEspacio
+                  );
+
+                  const periodo = fetchedPeriods.find(
+                    (period) => period.id === edicion.idPeriodo
+                  );
+
+                  return {
+                    ...edicion,
+                    inscripcions: inscripciones,
+                    usuario: usuario || null,
+                    espacio: espacio || null,
+                    periodo: periodo || null,
+                  };
+                } catch (error) {
+                  console.error(
+                    `Error fetching inscripciones for edicion ${edicion.id}:`,
+                    error
+                  );
+                  return {
+                    ...edicion,
+                    inscripcions: [],
+                    usuario: null,
+                    espacio: null,
+                    periodo: null,
+                  };
+                }
+              })
+            );
+
+            return { ...curso, edicionCursos: edicionesConInscripciones };
+          } catch (error) {
+            console.error(
+              `Error fetching edicion for curso ${curso.id}:`,
+              error
+            );
+            return { ...curso, edicionCursos: [] };
+          }
+        })
+      );
+
+      setCourseOptions(cursosConEdicionesYInscripciones);
+    } catch (error) {
+      console.error("Error fetching data:", error);
+    }
+  }, [dataUser.IdOrganizacion, token]);
+
+  useEffect(() => {
+    fetchCursos();
+  }, [fetchCursos]);
+
+  const handleCourseChange = (event, value) => {
+    if (value) {
+      const edicionCurso = value.edicionCursos[0];
+      const nombreProfesor =
+        edicionCurso && edicionCurso.usuario
+          ? `${edicionCurso.usuario.primer_Nombre} ${
+              edicionCurso.usuario.segundo_Nombre
+                ? edicionCurso.usuario.segundo_Nombre + " "
+                : ""
+            }${edicionCurso.usuario.primer_Apellido} ${
+              edicionCurso.usuario.segundo_Apellido
+            }`
+          : "";
+      setCourseInfo({
+        IdCurso: value.id,
+        NombreCurso: value.nombre,
+        IdProfesor:
+          edicionCurso && edicionCurso.usuario ? edicionCurso.usuario.id : "",
+        NombreProfesor: nombreProfesor,
+        IdEspacio:
+          edicionCurso && edicionCurso.espacio ? edicionCurso.espacio.id : "",
+        NombreEspacio:
+          edicionCurso && edicionCurso.espacio
+            ? edicionCurso.espacio.nombre
+            : "",
+        IdPeriodo:
+          edicionCurso && edicionCurso.periodo ? edicionCurso.periodo.id : "",
+        NombrePeriodo:
+          edicionCurso && edicionCurso.periodo
+            ? edicionCurso.periodo.nombre
+            : "",
+        IdOrganizacion: dataUser.IdOrganizacion,
+        IdEdicionCurso: edicionCurso ? edicionCurso.id : "",
+        Alumnos: edicionCurso ? edicionCurso.inscripcions : [],
+      });
+    } else {
+      setCourseInfo({
+        IdCurso: "",
+        NombreCurso: "",
+        IdProfesor: "",
+        NombreProfesor: "",
+        IdEspacio: "",
+        NombreEspacio: "",
+        IdPeriodo: "",
+        NombrePeriodo: "",
+        IdOrganizacion: "",
+        IdEdicionCurso: "",
+        Alumnos: [],
+      });
+    }
   };
 
-  const handleClassroomChange = (event) => {
-    setSelectedClassroom(event.target.value);
+  const handleStart = () => {
+    onStart(courseInfo);
   };
 
   return (
@@ -41,43 +188,59 @@ function StartCamera({ cameraTitle, professorName }) {
           <Typography variant="h6" gutterBottom>
             Título de la Cámara: {cameraTitle}
           </Typography>
-          <Typography variant="subtitle1" gutterBottom>
-            Profesor: {professorName}
-          </Typography>
           <br />
           <FormControl fullWidth>
-            <FormLabel>Selecciona una clase:</FormLabel>
-            <TextField
-              id="outlined"
-              select
-              label="Seleccione una opción"
-              value={selectedOption}
-              onChange={handleOptionChange}
-            >
-              {options.map((option) => (
-                <MenuItem key={option.value} value={option.value}>
-                  {option.label}
-                </MenuItem>
-              ))}
-            </TextField>
+            <FormLabel>Selecciona un Curso:</FormLabel>
+            <Autocomplete
+              options={courseOptions}
+              getOptionLabel={(option) => option.nombre || ""}
+              onChange={handleCourseChange}
+              renderInput={(params) => (
+                <TextField {...params} label="Cursos" variant="outlined" />
+              )}
+            />
           </FormControl>
-          <FormControl fullWidth>
-            <br />
-            <FormLabel>Selecciona un aula disponible:</FormLabel>
+          {courseInfo.NombreEspacio && (
             <TextField
-              id="outlined"
-              select
-              label="Seleccione un aula"
-              value={selectedClassroom}
-              onChange={handleClassroomChange}
-            >
-              {classrooms.map((classroom) => (
-                <MenuItem key={classroom.value} value={classroom.value}>
-                  {classroom.label}
-                </MenuItem>
-              ))}
-            </TextField>
-          </FormControl>
+              label="Nombre del Espacio"
+              value={courseInfo.NombreEspacio}
+              margin="normal"
+              fullWidth
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+          )}
+          {courseInfo.NombrePeriodo && (
+            <TextField
+              label="Nombre del Periodo"
+              value={courseInfo.NombrePeriodo}
+              margin="normal"
+              fullWidth
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+          )}
+          {courseInfo.NombreProfesor && (
+            <TextField
+              label="Nombre del Profesor"
+              value={courseInfo.NombreProfesor}
+              margin="normal"
+              fullWidth
+              InputProps={{
+                readOnly: true,
+              }}
+            />
+          )}
+          <Box mt={2}>
+            <Button color="primary" onClick={handleStart}>
+              Iniciar
+            </Button>
+            <Button color="error" onClick={handleClose}>
+              Cancelar
+            </Button>
+          </Box>
         </div>
       </Box>
     </div>

@@ -21,15 +21,19 @@ import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import PersonAddIcon from "@mui/icons-material/PersonAdd";
 import GroupAddIcon from "@mui/icons-material/GroupAdd";
-import VideoCallIcon from "@mui/icons-material/VideoCall"; // Importar el nuevo ícono
+import VideoCallIcon from "@mui/icons-material/VideoCall";
+import FitnessCenterIcon from "@mui/icons-material/FitnessCenter";
 import Header from "./Header";
 import ModalCurso from "../modals/ModalCurso";
 import ModalAsignarProfesor from "../modals/ModalAsignarProfesor";
 import ModalAssignStudents from "../modals/ModalAssignStudents";
-import ModalAssignVideoStudent from "../modals/ModalAssignVideoStudent"; // Importar el nuevo modal
+import ModalAssignVideoStudent from "../modals/ModalAssignVideoStudent";
 import CursoController from "../serviceApi/CursoController";
 import EdicionCursoController from "../serviceApi/EdicionCursoController";
+import InscripcionController from "../serviceApi/InscripcionController";
 import UsuarioController from "../serviceApi/UsuarioController";
+import AlumnoController from "../serviceApi/AlumnoController";
+import ImagenReferenciaController from "../serviceApi/ImagenReferenciaController";
 import { AuthContext } from "../contexts/AuthContext";
 
 const CursoTable = () => {
@@ -40,10 +44,11 @@ const CursoTable = () => {
   const [openEdit, setOpenEdit] = useState(false);
   const [openAssignProfessor, setOpenAssignProfessor] = useState(false);
   const [openAssignStudents, setOpenAssignStudents] = useState(false);
-  const [openAssignVideoStudents, setOpenAssignVideoStudents] = useState(false); // Estado para el nuevo modal
-  const [ClassEdit, setClassEdit] = useState();
+  const [openAssignVideoStudents, setOpenAssignVideoStudents] = useState(false);
+  const [ClassEdit, setClassEdit] = useState(null);
   const [Cursos, setCursos] = useState([]);
-  const { dataUser, token } = useContext(AuthContext);
+  const [filteredCursos, setFilteredCursos] = useState([]);
+  const { dataUser, token, isAdmin } = useContext(AuthContext);
 
   const dialogRef = React.useRef(null);
 
@@ -54,29 +59,63 @@ const CursoTable = () => {
         token
       );
 
-      const admins = await UsuarioController.getUsers(2, token); // Asumiendo que el rol de administrador es 2
+      const admins = await UsuarioController.getUsers(2, token);
 
       const cursosConEdiciones = await Promise.all(
         fetchedCursos.map(async (curso) => {
-          const edicionCurso = await EdicionCursoController.GetEdicionCurso(
-            curso.id,
-            token
-          ).catch(() => []); // Asegura que `edicionCurso` sea un arreglo vacío si falla
+          try {
+            const edicionCurso = await EdicionCursoController.GetEdicionCurso(
+              curso.id,
+              token
+            );
+            const admin =
+              edicionCurso.length > 0
+                ? admins.find(
+                    (admin) => admin.id_Persona === edicionCurso[0].idPersona
+                  )
+                : null;
 
-          const admin =
-            edicionCurso.length > 0
-              ? admins.find(
-                  (admin) => admin.id_Persona === edicionCurso[0].idPersona
-                )
-              : null;
+            const inscripciones =
+              edicionCurso.length > 0
+                ? await InscripcionController.SearchInscripcion(
+                    edicionCurso[0].id,
+                    token
+                  )
+                : [];
 
-          return {
-            ...curso,
-            edicionCurso: edicionCurso.length > 0 ? edicionCurso[0] : null,
-            nombreAdmin: admin
-              ? `${admin.primer_Nombre} ${admin.segundo_Nombre} ${admin.primer_Apellido} ${admin.segundo_Apellido}`
-              : "N/A",
-          };
+            const imagenes =
+              await ImagenReferenciaController.BuscarImagenesReferenciaPorCurso(
+                curso.id,
+                token
+              );
+
+            const idsAlumnos = inscripciones.map(
+              (inscripcion) => inscripcion.idAlumno
+            );
+            const idsConVideo = imagenes.map((imagen) => imagen.iD_Alumno);
+            const check = idsAlumnos.every((id) => idsConVideo.includes(id));
+
+            return {
+              ...curso,
+              edicionCursos:
+                edicionCurso.length > 0
+                  ? { ...edicionCurso[0], inscripcions: inscripciones }
+                  : null,
+              nombreAdmin: admin
+                ? `${admin.primer_Nombre} ${admin.segundo_Nombre} ${admin.primer_Apellido} ${admin.segundo_Apellido}`
+                : "N/A",
+              imagenesReferencia: imagenes,
+              check,
+            };
+          } catch (error) {
+            return {
+              ...curso,
+              edicionCursos: null,
+              nombreAdmin: "N/A",
+              imagenesReferencia: [],
+              check: false,
+            };
+          }
         })
       );
 
@@ -87,8 +126,21 @@ const CursoTable = () => {
   }, [dataUser.IdOrganizacion, token]);
 
   useEffect(() => {
-    fetchCursos();
+    const fetchData = async () => {
+      await fetchCursos();
+    };
+    fetchData();
   }, [fetchCursos]);
+
+  useEffect(() => {
+    const filtered = isAdmin
+      ? Cursos.filter(
+          (curso) =>
+            curso.edicionCursos && curso.edicionCursos.idPersona === dataUser.id
+        )
+      : Cursos;
+    setFilteredCursos(filtered);
+  }, [isAdmin, dataUser.id, Cursos]);
 
   const handleOpenAdd = () => {
     setOpenAdd(true);
@@ -96,7 +148,7 @@ const CursoTable = () => {
 
   const handleCloseAdd = () => {
     setOpenAdd(false);
-    fetchCursos(); // Refresh cursos after adding
+    fetchCursos();
   };
 
   const handleOpenEdit = (Class) => {
@@ -106,7 +158,7 @@ const CursoTable = () => {
 
   const handleCloseEdit = () => {
     setOpenEdit(false);
-    fetchCursos(); // Refresh cursos after editing
+    fetchCursos();
   };
 
   const handleChangePage = (event, newPage) => {
@@ -131,7 +183,7 @@ const CursoTable = () => {
     try {
       await CursoController.DeleteCurso(id, token);
       setOpenDelete(false);
-      fetchCursos(); // Refresh cursos after deleting
+      fetchCursos();
     } catch (error) {
       console.error("Error deleting curso:", error);
     }
@@ -144,8 +196,8 @@ const CursoTable = () => {
   };
 
   const handleAssignProfessor = (curso) => {
-    setClassEdit(curso); // Guarda los datos del curso en el estado
-    setOpenAssignProfessor(true); // Abre el modal para asignar profesor
+    setClassEdit(curso);
+    setOpenAssignProfessor(true);
   };
 
   const handleCloseAssignProfessor = () => {
@@ -153,8 +205,8 @@ const CursoTable = () => {
   };
 
   const handleAssignStudents = (curso) => {
-    setClassEdit(curso); // Guarda los datos del curso en el estado
-    setOpenAssignStudents(true); // Abre el modal para asignar alumnos
+    setClassEdit(curso);
+    setOpenAssignStudents(true);
   };
 
   const handleCloseAssignStudents = () => {
@@ -162,12 +214,50 @@ const CursoTable = () => {
   };
 
   const handleAssignVideoStudents = (curso) => {
-    setClassEdit(curso); // Guarda los datos del curso en el estado
-    setOpenAssignVideoStudents(true); // Abre el modal para asignar videos a los alumnos
+    setClassEdit(curso);
+    setOpenAssignVideoStudents(true);
   };
 
   const handleCloseAssignVideoStudents = () => {
     setOpenAssignVideoStudents(false);
+  };
+
+  const handleEntrenar = async (curso) => {
+    const alumnoImagenMap = {};
+
+    try {
+      const fetchedAlumnos = await AlumnoController.GetAlumnos(
+        parseInt(dataUser.IdOrganizacion),
+        token
+      );
+
+      curso.edicionCursos.inscripcions.forEach((inscripcion) => {
+        const idAlumno = inscripcion.idAlumno;
+        const imagenReferencia = curso.imagenesReferencia.find(
+          (imagen) => imagen.iD_Alumno === idAlumno
+        );
+
+        const alumno = fetchedAlumnos.find((alumno) => alumno.id === idAlumno);
+
+        if (imagenReferencia && alumno) {
+          const nombreCompleto = `${alumno.primer_Nombre} ${
+            alumno.segundo_Nombre || ""
+          } ${alumno.primer_Apellido} ${alumno.segundo_Apellido}`.toLowerCase();
+          alumnoImagenMap[nombreCompleto + "_" + idAlumno] =
+            imagenReferencia.ruta_Archivo;
+        }
+      });
+
+      const cursoData = {
+        cursoId: curso.id,
+        alumnos: alumnoImagenMap,
+      };
+
+      console.log("Entrenar modelo para el curso:", cursoData);
+      // Aquí puedes agregar la lógica adicional necesaria para entrenar el modelo con cursoData
+    } catch (error) {
+      console.error("Error fetching alumnos:", error);
+    }
   };
 
   return (
@@ -176,11 +266,13 @@ const CursoTable = () => {
       <div className="container">
         <h2>Cursos</h2>
         <div style={{ width: "80rem" }}>
-          <Tooltip title="Agregar" placement="top">
-            <IconButton onClick={handleOpenAdd} aria-label="add">
-              <AddCircleIcon fontSize="large" color="primary" />
-            </IconButton>
-          </Tooltip>
+          {!isAdmin && (
+            <Tooltip title="Agregar" placement="top">
+              <IconButton onClick={handleOpenAdd} aria-label="add">
+                <AddCircleIcon fontSize="large" color="primary" />
+              </IconButton>
+            </Tooltip>
+          )}
         </div>
         <TableContainer sx={{ width: "80rem" }} component={Paper}>
           <Table sx={{ width: "80rem" }} aria-label="simple table">
@@ -196,11 +288,11 @@ const CursoTable = () => {
             </TableHead>
             <TableBody>
               {(rowsPerPage > 0
-                ? Cursos.slice(
+                ? filteredCursos.slice(
                     page * rowsPerPage,
                     page * rowsPerPage + rowsPerPage
                   )
-                : Cursos
+                : filteredCursos
               ).map((curso) => (
                 <TableRow
                   key={curso.id}
@@ -212,8 +304,8 @@ const CursoTable = () => {
                   <TableCell align="left">{curso.nombre}</TableCell>
                   <TableCell align="left">{curso.codigoCurso}</TableCell>
                   <TableCell align="left">
-                    {curso.edicionCurso
-                      ? curso.edicionCurso.nombreGrupo
+                    {curso.edicionCursos
+                      ? curso.edicionCursos.nombreGrupo
                       : "N/A"}
                   </TableCell>
                   <TableCell align="left">
@@ -223,24 +315,29 @@ const CursoTable = () => {
                     align="center"
                     sx={{ display: "flex", justifyContent: "center" }}
                   >
-                    <div className="action-btn">
-                      <Tooltip
-                        title={
-                          curso.edicionCurso && curso.edicionCurso.idUsuario
-                            ? "Editar Profesor"
-                            : "Asignar Profesor"
-                        }
-                        placement="top"
-                      >
-                        <IconButton
-                          color="primary"
-                          aria-label="assign-professor"
-                          onClick={() => handleAssignProfessor(curso)}
-                        >
-                          <PersonAddIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
+                    {!isAdmin && (
+                      <>
+                        <div className="action-btn">
+                          <Tooltip
+                            title={
+                              curso.edicionCursos &&
+                              curso.edicionCursos.idUsuario
+                                ? "Editar Profesor"
+                                : "Asignar Profesor"
+                            }
+                            placement="top"
+                          >
+                            <IconButton
+                              color="primary"
+                              aria-label="assign-professor"
+                              onClick={() => handleAssignProfessor(curso)}
+                            >
+                              <PersonAddIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                      </>
+                    )}
                     <div className="action-btn">
                       <Tooltip title="Seleccionar Alumnos" placement="top">
                         <IconButton
@@ -255,7 +352,7 @@ const CursoTable = () => {
                     <div className="action-btn">
                       <Tooltip title="Asignar Videos" placement="top">
                         <IconButton
-                          color="secondary"
+                          color="warning"
                           aria-label="assign-videos"
                           onClick={() => handleAssignVideoStudents(curso)}
                         >
@@ -264,27 +361,52 @@ const CursoTable = () => {
                       </Tooltip>
                     </div>
                     <div className="action-btn">
-                      <Tooltip title="Eliminar" placement="top">
-                        <IconButton
-                          color="error"
-                          aria-label="delete"
-                          onClick={() => handleClickOpenDelete(curso)}
-                        >
-                          <DeleteIcon />
-                        </IconButton>
+                      <Tooltip
+                        title={
+                          curso.check
+                            ? "Entrenar el modelo"
+                            : "No todos los alumnos tienen video"
+                        }
+                        placement="top"
+                      >
+                        <span>
+                          <IconButton
+                            color="default"
+                            aria-label="entrenar"
+                            onClick={() => handleEntrenar(curso)}
+                            disabled={!curso.check}
+                          >
+                            <FitnessCenterIcon />
+                          </IconButton>
+                        </span>
                       </Tooltip>
                     </div>
-                    <div className="action-btn">
-                      <Tooltip title="Editar" placement="top">
-                        <IconButton
-                          color="success"
-                          aria-label="edit"
-                          onClick={() => handleOpenEdit(curso)}
-                        >
-                          <EditIcon />
-                        </IconButton>
-                      </Tooltip>
-                    </div>
+                    {!isAdmin && (
+                      <>
+                        <div className="action-btn">
+                          <Tooltip title="Eliminar" placement="top">
+                            <IconButton
+                              color="error"
+                              aria-label="delete"
+                              onClick={() => handleClickOpenDelete(curso)}
+                            >
+                              <DeleteIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                        <div className="action-btn">
+                          <Tooltip title="Editar" placement="top">
+                            <IconButton
+                              color="success"
+                              aria-label="edit"
+                              onClick={() => handleOpenEdit(curso)}
+                            >
+                              <EditIcon />
+                            </IconButton>
+                          </Tooltip>
+                        </div>
+                      </>
+                    )}
                   </TableCell>
                 </TableRow>
               ))}
@@ -295,7 +417,7 @@ const CursoTable = () => {
           sx={{ width: "80rem" }}
           component="div"
           rowsPerPageOptions={[5, 10, 25]}
-          count={Cursos.length}
+          count={filteredCursos.length}
           page={page}
           onPageChange={handleChangePage}
           rowsPerPage={rowsPerPage}
@@ -361,7 +483,8 @@ const CursoTable = () => {
         >
           <DialogContent>
             <ModalAssignStudents
-              idEdicionCurso={ClassEdit?.edicionCurso?.id || null}
+              id={ClassEdit?.id || null}
+              idEdicionCurso={ClassEdit?.edicionCursos?.id || null}
               handleClose={handleCloseAssignStudents}
             />
           </DialogContent>
@@ -372,10 +495,13 @@ const CursoTable = () => {
           open={openAssignVideoStudents}
         >
           <DialogContent>
-            <ModalAssignVideoStudent
-              idEdicionCurso={ClassEdit?.edicionCurso?.id || null}
-              handleClose={handleCloseAssignVideoStudents}
-            />
+            {ClassEdit && ClassEdit.edicionCursos ? (
+              <ModalAssignVideoStudent
+                id={ClassEdit.id}
+                idEdicionCurso={ClassEdit.edicionCursos.id}
+                handleClose={handleCloseAssignVideoStudents}
+              />
+            ) : null}
           </DialogContent>
         </Dialog>
       </div>

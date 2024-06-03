@@ -11,14 +11,14 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
 
   const [courseData, setCourseData] = useState({
     idCurso: curso.id,
-    idEspacio: curso.edicionCurso ? curso.edicionCurso.idEspacio : null,
-    idPeriodo: curso.edicionCurso ? curso.edicionCurso.idPeriodo : null,
-    idProfesor: curso.edicionCurso ? curso.edicionCurso.idProfesor : null,
-    nombreEdicionCurso: curso.edicionCurso
-      ? curso.edicionCurso.nombreGrupo
+    idEspacio: curso.edicionCursos ? curso.edicionCursos.idEspacio : null,
+    idPeriodo: curso.edicionCursos ? curso.edicionCursos.idPeriodo : null,
+    idProfesor: curso.edicionCursos ? curso.edicionCursos.idProfesor : null,
+    nombreEdicionCurso: curso.edicionCursos
+      ? curso.edicionCursos.nombreGrupo
       : "",
-    fechaInicio: curso.edicionCurso ? curso.edicionCurso.fechaInicio : "",
-    fechaFin: curso.edicionCurso ? curso.edicionCurso.fechaFin : "",
+    fechaInicio: curso.edicionCursos ? curso.edicionCursos.fechaInicio : "",
+    fechaFin: curso.edicionCursos ? curso.edicionCursos.fechaFin : "",
     idOrganizacion: parseInt(dataUser.IdOrganizacion),
   });
 
@@ -26,7 +26,7 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
   const [periods, setPeriods] = useState([]);
   const [profesores, setProfesores] = useState([]);
   const [selectedProfesor, setSelectedProfesor] = useState({
-    idProfesor: curso.edicionCurso?.idUsuario || null,
+    idProfesor: curso.edicionCursos?.idUsuario || null,
     nombreProfesor: curso.nombreAdmin || "",
   });
 
@@ -67,14 +67,14 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
             } ${profesor.segundo_Apellido}` === curso.nombreAdmin
         );
         setSelectedProfesor({
-          idProfesor: selected?.id || curso.edicionCurso?.idUsuario || null,
+          idProfesor: selected?.id || curso.edicionCursos?.idUsuario || null,
           nombreProfesor: curso.nombreAdmin || "",
         });
       }
     } catch (error) {
       console.error("Error fetching professors:", error);
     }
-  }, [curso.nombreAdmin, curso.edicionCurso?.idUsuario, token]);
+  }, [curso.nombreAdmin, curso.edicionCursos?.idUsuario, token]);
 
   useEffect(() => {
     fetchSpaces();
@@ -139,9 +139,9 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
         FechaFin: courseData.fechaFin,
       };
 
-      if (curso.edicionCurso) {
+      if (curso.edicionCursos) {
         await EdicionCursoController.UpdateEdicionCurso(
-          curso.edicionCurso.id,
+          curso.edicionCursos.id,
           newEdicionCurso,
           token
         );
@@ -245,7 +245,7 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
 
           <div className="button-container">
             <Button sx={{ mt: 2 }} onClick={handleSave}>
-              {curso.edicionCurso ? "Editar" : "Asignar"} Profesor
+              {curso.edicionCursos ? "Editar" : "Asignar"} Profesor
             </Button>
             <Button sx={{ mt: 2 }} color="error" onClick={handleClose}>
               Cancelar

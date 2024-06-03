@@ -106,6 +106,31 @@ const PersonaController = {
       throw error;
     }
   },
+
+  GetPersonByUsername: async (username, token) => {
+    try {
+      const response = await fetch(
+        `${BACKEND}Persona/BuscarPorNombreUsuario?nombreUsuario=${username}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error("Error al buscar la persona por nombre de usuario");
+      }
+
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      console.error("Error al buscar la persona por nombre de usuario:", error);
+      throw error;
+    }
+  },
 };
 
 export default PersonaController;

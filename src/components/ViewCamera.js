@@ -2,20 +2,22 @@ import React, { useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import "../styles/styleViewCamera.css";
-import MoreVertIcon from "@mui/icons-material/MoreVert";
-import videoSource from "../media/Facial.mp4";
-import ViewListAssist from "../modals/ViewListAssist";
-import { Button, Dialog, DialogActions, DialogContent } from "@mui/material";
-import EmotionsChart from "./EmotionsChart";
+import ModalListAssist from "../modals/ModalListAssist";
+import {
+  Box,
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+} from "@mui/material";
+import { useLocation } from "react-router-dom";
 
 function ViewCamera() {
-  const [menuOpen, setMenuOpen] = useState(false);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [divHidden, setDivHidden] = useState(false);
+  const location = useLocation();
+  const courseInfo = location.state?.courseInfo;
 
-  const handleMenuClick = () => {
-    setMenuOpen(!menuOpen);
-  };
+  console.log(courseInfo);
 
   const handleOpenModal = () => {
     setIsModalOpen(true);
@@ -25,49 +27,29 @@ function ViewCamera() {
     setIsModalOpen(false);
   };
 
-  const handleCheckboxChange = () => {
-    setDivHidden(!divHidden);
-  };
-
   return (
-    <div>
+    <div
+      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+    >
       <Header />
-      <div className="video-container">
-        <video className="video" controls>
-          <source src={videoSource} type="video/mp4" />
-        </video>
-        <div className="menu-container">
-          <MoreVertIcon className="VertIcon" onClick={handleMenuClick} />
-          {menuOpen && (
-            <div className="menu-dropdown">
-              <label>
-                <input
-                  type="checkbox"
-                  checked={divHidden}
-                  onChange={handleCheckboxChange}
-                />
-                Mostrar emociones
-              </label>
-              <div className="button-container">
-                <Button
-                  sx={{ width: "100%" }}
-                  variant="outlined"
-                  onClick={handleOpenModal}
-                >
-                  Lista de Asistencia
-                </Button>
-              </div>
-            </div>
-          )}
-        </div>
-        {divHidden && (
-          <EmotionsChart orientation="horizontal" position="top-right" />
-        )}
-        <Dialog open={isModalOpen} onClose={handleCloseModal}>
+      <Box sx={{ flex: "1 0 auto" }}>
+        <Button
+          sx={{ top: 16, left: 16 }}
+          variant="outlined"
+          onClick={handleOpenModal}
+        >
+          Lista de Asistencia
+        </Button>
+
+        <Dialog
+          open={isModalOpen}
+          onClose={handleCloseModal}
+          maxWidth="md"
+          fullWidth
+          PaperProps={{ style: { minHeight: "50vh" } }}
+        >
           <DialogContent>
-            <div className="ViewListAssist">
-              <ViewListAssist />
-            </div>
+            <ModalListAssist alumnos={courseInfo.Alumnos} />
           </DialogContent>
           <DialogActions>
             <div className="button-container">
@@ -77,8 +59,8 @@ function ViewCamera() {
             </div>
           </DialogActions>
         </Dialog>
-      </div>
-      <Footer />
+      </Box>
+      <Footer sx={{ flexShrink: 0 }} />
     </div>
   );
 }

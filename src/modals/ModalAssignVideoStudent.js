@@ -24,7 +24,7 @@ import InscripcionController from "../serviceApi/InscripcionController";
 import ImagenReferenciaController from "../serviceApi/ImagenReferenciaController"; // Importar el controlador
 import { AuthContext } from "../contexts/AuthContext";
 
-const ModalAssignVideoStudent = ({ idEdicionCurso, handleClose }) => {
+const ModalAssignVideoStudent = ({ id, idEdicionCurso, handleClose }) => {
   const { dataUser, token } = useContext(AuthContext);
   const [alumnos, setAlumnos] = useState([]);
   const [inscritos, setInscritos] = useState([]);
@@ -37,8 +37,9 @@ const ModalAssignVideoStudent = ({ idEdicionCurso, handleClose }) => {
   const [errorDialogOpen, setErrorDialogOpen] = useState(false);
   const [errorMessage, setErrorMessage] = useState("");
   const [successDialogOpen, setSuccessDialogOpen] = useState(false);
+  const [urlVideo, setUrlVideo] = useState([]);
 
-  const fetchAlumnos = useCallback(async () => {
+  const fetchData = useCallback(async () => {
     try {
       const fetchedAlumnos = await AlumnoController.GetAlumnos(
         dataUser.IdOrganizacion,
@@ -48,17 +49,34 @@ const ModalAssignVideoStudent = ({ idEdicionCurso, handleClose }) => {
         idEdicionCurso,
         token
       );
+      const fetchUrls =
+        await ImagenReferenciaController.BuscarImagenesReferenciaPorCurso(
+          id,
+          token
+        );
+
       setAlumnos(fetchedAlumnos);
       setInscritos(fetchedInscritos);
       filterInscritos(fetchedAlumnos, fetchedInscritos);
+      setUrlVideo(fetchUrls);
+
+      const initialUrls = {};
+      fetchUrls.forEach((video) => {
+        fetchedAlumnos.forEach((alumno) => {
+          if (alumno.id === video.iD_Alumno) {
+            initialUrls[alumno.id] = video.ruta_Archivo;
+          }
+        });
+      });
+      setUrls(initialUrls);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [dataUser.IdOrganizacion, idEdicionCurso, token]);
+  }, [dataUser.IdOrganizacion, id, idEdicionCurso, token]);
 
   useEffect(() => {
-    fetchAlumnos();
-  }, [fetchAlumnos]);
+    fetchData();
+  }, [fetchData]);
 
   const filterInscritos = (alumnos, inscritos) => {
     const filtered = alumnos.filter((alumno) =>
@@ -96,7 +114,7 @@ const ModalAssignVideoStudent = ({ idEdicionCurso, handleClose }) => {
     }));
     setValidUrls((prevValidUrls) => ({
       ...prevValidUrls,
-      [alumnoId]: false,
+      [alumnoId]: null,
     }));
   };
 
@@ -105,68 +123,107 @@ const ModalAssignVideoStudent = ({ idEdicionCurso, handleClose }) => {
     return fecha.toISOString().split("T")[0];
   };
 
-  const videoData = filteredAlumnos.map((alumno) => ({
-    IdPersona: alumno.id_Persona,
-    RutaArchivo: urls[alumno.id] || "",
-    FechaCarga: getFechaCarga(),
-    Usado: true,
-  }));
+  const videoData = filteredAlumnos.map((alumno) => {
+    const existingVideo = urlVideo.find(
+      (video) => video.iD_Alumno === alumno.id
+    );
+    return {
+      IdPersona: alumno.id_Persona,
+      RutaArchivo: urls[alumno.id] || "",
+      FechaCarga: getFechaCarga(),
+      Usado: true,
+      id: existingVideo ? existingVideo.id : null,
+      isEdit: existingVideo ? true : false,
+    };
+  });
 
   const allUrlsFilled = filteredAlumnos.every((alumno) => urls[alumno.id]);
-  const allUrlsValid = filteredAlumnos.every((alumno) => validUrls[alumno.id]);
 
   const handleEnviar = async () => {
+    const checkUrlsPromises = filteredAlumnos.map((alumno) =>
+      handleComprobarUrl(alumno.id, urls[alumno.id])
+    );
+
     try {
-      await ImagenReferenciaController.InsertarImagenReferencia(
-        videoData,
-        token
-      );
+      await Promise.all(checkUrlsPromises);
+
+      const insertData = videoData.filter((video) => !video.isEdit);
+      const editData = videoData.filter((video) => video.isEdit);
+
+      if (insertData.length > 0) {
+        await ImagenReferenciaController.InsertarImagenReferencia(
+          insertData,
+          token
+        );
+      }
+
+      if (editData.length > 0) {
+        await ImagenReferenciaController.ModificarImagenReferencia(
+          editData,
+          token
+        );
+      }
+
       setSuccessDialogOpen(true);
+      handleClose(); // Cerrar el modal al enviar correctamente
     } catch (error) {
-      setErrorMessage("Error al insertar las imágenes de referencia");
+      setErrorMessage("Error al comprobar las URLs o al guardar los datos.");
       setErrorDialogOpen(true);
     }
   };
 
   const handleComprobarUrl = (alumnoId, url) => {
-    if (url) {
-      const fileId = url.match(/[-\w]{25,}/); // Extrae el ID del archivo del enlace de Google Drive
-      if (fileId) {
-        const directUrl = `https://drive.google.com/file/d/${fileId[0]}/preview`;
-        fetch(directUrl)
-          .then((response) => {
-            if (response.ok) {
-              window.open(directUrl, "_blank");
-              setValidUrls((prevValidUrls) => ({
-                ...prevValidUrls,
-                [alumnoId]: true,
-              }));
-            } else {
-              setErrorMessage(
-                "El enlace de Google Drive no muestra contenido válido"
-              );
-              setErrorDialogOpen(true);
+    return new Promise((resolve, reject) => {
+      if (url) {
+        const fileId = url.match(/[-\w]{25,}/); // Extrae el ID del archivo del enlace de Google Drive
+        if (fileId) {
+          const directUrl = `https://drive.google.com/file/d/${fileId[0]}/preview`;
+          fetch(directUrl)
+            .then((response) => {
+              if (response.ok) {
+                setValidUrls((prevValidUrls) => ({
+                  ...prevValidUrls,
+                  [alumnoId]: true,
+                }));
+                resolve(true);
+              } else {
+                setValidUrls((prevValidUrls) => ({
+                  ...prevValidUrls,
+                  [alumnoId]: false,
+                }));
+                reject(
+                  new Error(
+                    "El enlace de Google Drive no muestra contenido válido"
+                  )
+                );
+              }
+            })
+            .catch(() => {
               setValidUrls((prevValidUrls) => ({
                 ...prevValidUrls,
                 [alumnoId]: false,
               }));
-            }
-          })
-          .catch(() => {
-            setErrorMessage(
-              "El enlace de Google Drive no muestra contenido válido"
-            );
-            setErrorDialogOpen(true);
-            setValidUrls((prevValidUrls) => ({
-              ...prevValidUrls,
-              [alumnoId]: false,
-            }));
-          });
+              reject(
+                new Error(
+                  "El enlace de Google Drive no muestra contenido válido"
+                )
+              );
+            });
+        } else {
+          setValidUrls((prevValidUrls) => ({
+            ...prevValidUrls,
+            [alumnoId]: false,
+          }));
+          reject(new Error("URL de Google Drive no válido"));
+        }
       } else {
-        setErrorMessage("URL de Google Drive no válido");
-        setErrorDialogOpen(true);
+        setValidUrls((prevValidUrls) => ({
+          ...prevValidUrls,
+          [alumnoId]: false,
+        }));
+        reject(new Error("URL no puede estar vacío"));
       }
-    }
+    });
   };
 
   const handleErrorDialogClose = () => {
@@ -222,7 +279,6 @@ const ModalAssignVideoStudent = ({ idEdicionCurso, handleClose }) => {
                 <TableRow>
                   <TableCell>Nombre Completo</TableCell>
                   <TableCell>URL del Video</TableCell>
-                  <TableCell>Acciones</TableCell>
                 </TableRow>
               </TableHead>
               <TableBody>
@@ -243,18 +299,13 @@ const ModalAssignVideoStudent = ({ idEdicionCurso, handleClose }) => {
                           }
                           placeholder="URL del video"
                           fullWidth
-                          disabled={validUrls[alumno.id]} // Deshabilitar si la URL es válida
+                          error={validUrls[alumno.id] === false} // Mostrar error en el campo si la URL no es válida
+                          helperText={
+                            validUrls[alumno.id] === false
+                              ? "Verifica que el URL sea correcto"
+                              : ""
+                          } // Mostrar helperText si la URL no es válida
                         />
-                      </TableCell>
-                      <TableCell>
-                        <Button
-                          onClick={() =>
-                            handleComprobarUrl(alumno.id, urls[alumno.id] || "")
-                          }
-                          disabled={!urls[alumno.id]}
-                        >
-                          Comprobar
-                        </Button>
                       </TableCell>
                     </TableRow>
                   ))}
@@ -281,7 +332,7 @@ const ModalAssignVideoStudent = ({ idEdicionCurso, handleClose }) => {
             <Button
               sx={{ mt: 2, mr: 1 }}
               onClick={handleEnviar}
-              disabled={!allUrlsFilled || !allUrlsValid}
+              disabled={!allUrlsFilled}
             >
               Enviar
             </Button>
