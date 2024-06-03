@@ -17,6 +17,7 @@ import {
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AlumnoController from "../serviceApi/AlumnoController";
@@ -30,6 +31,10 @@ const ModalAssignStudents = ({ idEdicionCurso, handleClose }) => {
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
   const [rowsPerPage, setRowsPerPage] = useState(5);
+  const [errorDialogOpen, setErrorDialogOpen] = useState(false);
+  const [confirmDialogOpen, setConfirmDialogOpen] = useState(false);
+  const [errorMessage, setErrorMessage] = useState("");
+  const [alumnoToDeselect, setAlumnoToDeselect] = useState(null);
 
   const fetchAlumnos = useCallback(async () => {
     try {
@@ -42,9 +47,10 @@ const ModalAssignStudents = ({ idEdicionCurso, handleClose }) => {
       const fetchedInscripciones =
         await InscripcionController.SearchInscripcion(idEdicionCurso, token);
 
-      const inscripcionAlumnos = fetchedInscripciones.map(
-        (inscripcion) => inscripcion.idAlumno
-      );
+      const inscripcionAlumnos = fetchedInscripciones.map((inscripcion) => ({
+        id: inscripcion.idAlumno,
+        initiallySelected: true,
+      }));
 
       setSelectedAlumnos(inscripcionAlumnos);
     } catch (error) {
@@ -56,26 +62,67 @@ const ModalAssignStudents = ({ idEdicionCurso, handleClose }) => {
     fetchAlumnos();
   }, [fetchAlumnos]);
 
-  const handleToggleAlumno = (alumnoId) => {
-    setSelectedAlumnos((prevSelected) =>
-      prevSelected.includes(alumnoId)
-        ? prevSelected.filter((id) => id !== alumnoId)
-        : [...prevSelected, alumnoId]
+  const handleToggleAlumno = async (alumnoId) => {
+    const isSelected = selectedAlumnos.some(
+      (alumno) => alumno.id === alumnoId && alumno.initiallySelected
     );
+
+    if (isSelected) {
+      setAlumnoToDeselect(alumnoId);
+      setConfirmDialogOpen(true);
+    } else {
+      setSelectedAlumnos((prevSelected) => {
+        const exists = prevSelected.some((alumno) => alumno.id === alumnoId);
+        if (exists) {
+          return prevSelected.filter((alumno) => alumno.id !== alumnoId);
+        }
+        return [...prevSelected, { id: alumnoId, initiallySelected: false }];
+      });
+    }
+  };
+
+  const handleConfirmDeselect = async () => {
+    try {
+      const inscripcion = (
+        await InscripcionController.SearchInscripcion(idEdicionCurso, token)
+      ).find((inscripcion) => inscripcion.idAlumno === alumnoToDeselect);
+      if (inscripcion) {
+        await InscripcionController.DeleteInscripcion(inscripcion.id, token);
+      }
+      setSelectedAlumnos((prevSelected) =>
+        prevSelected.filter((alumno) => alumno.id !== alumnoToDeselect)
+      );
+      setAlumnoToDeselect(null);
+      setConfirmDialogOpen(false);
+    } catch (error) {
+      console.error("Error al eliminar la inscripción:", error);
+      setErrorMessage("Error al eliminar la inscripción.");
+      setErrorDialogOpen(true);
+    }
   };
 
   const handleSave = async () => {
-    if (!idEdicionCurso) {
-      alert("Por favor, seleccione una edición de curso.");
+    const alumnosYaRegistrados = selectedAlumnos.filter(
+      (alumno) => alumno.initiallySelected
+    );
+    const nuevosAlumnos = selectedAlumnos.filter(
+      (alumno) => !alumno.initiallySelected
+    );
+
+    if (alumnosYaRegistrados.length > 0 && nuevosAlumnos.length === 0) {
+      setErrorMessage(
+        "Todos los alumnos que está intentando asignar ya están registrados."
+      );
+      setErrorDialogOpen(true);
       return;
     }
 
     const fechaInscripcion = new Date().toISOString().split("T")[0]; // Obtener la fecha actual en formato "YYYY-MM-DD"
 
     try {
-      const inscripciones = selectedAlumnos.map((idAlumno) => ({
+      const inscripciones = nuevosAlumnos.map((alumno) => ({
         id_Edicion_Curso: idEdicionCurso,
-        id_Alumno: idAlumno,
+        id_Alumno: alumno.id,
         fecha_Inscripcion: fechaInscripcion,
         estado: true,
       }));
@@ -109,6 +156,17 @@ const ModalAssignStudents = ({ idEdicionCurso, handleClose }) => {
     } ${alumno.segundo_Apellido}`.toLowerCase();
     return fullName.includes(searchQuery.toLowerCase());
   });
+
+  const isAlumnoSelected = (alumnoId) =>
+    selectedAlumnos.some((alumno) => alumno.id === alumnoId);
+
+  const handleErrorDialogClose = () => {
+    setErrorDialogOpen(false);
+  };
+
+  const handleConfirmDialogClose = () => {
+    setConfirmDialogOpen(false);
+  };
 
   return (
     <Dialog open={true} onClose={handleClose} maxWidth="md" fullWidth>
@@ -169,7 +227,7 @@ const ModalAssignStudents = ({ idEdicionCurso, handleClose }) => {
                       </TableCell>
                       <TableCell align="center">
                         <Checkbox
-                          checked={selectedAlumnos.includes(alumno.id)}
+                          checked={isAlumnoSelected(alumno.id)}
                           onChange={() => handleToggleAlumno(alumno.id)}
                         />
                       </TableCell>
@@ -204,6 +262,31 @@ const ModalAssignStudents = ({ idEdicionCurso, handleClose }) => {
           </div>
         </Box>
       </DialogContent>
+      <Dialog open={errorDialogOpen} onClose={handleErrorDialogClose}>
+        <DialogTitle>Error</DialogTitle>
+        <DialogContent>
+          <Box>{errorMessage}</Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleErrorDialogClose} color="primary">
+            Cerrar
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Dialog open={confirmDialogOpen} onClose={handleConfirmDialogClose}>
+        <DialogTitle>Confirmación</DialogTitle>
+        <DialogContent>
+          <Box>¿Estás seguro que quieres quitar este alumno de la lista?</Box>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handleConfirmDialogClose} color="error">
+            Cancelar
+          </Button>
+          <Button onClick={handleConfirmDeselect} color="success">
+            Confirmar
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Dialog>
   );
 };

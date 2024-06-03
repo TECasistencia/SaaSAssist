@@ -1,23 +1,58 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import Box from "@mui/material/Box";
 import Grid from "@mui/material/Grid";
 import CameraCard from "./CameraCard";
 import StartCamera from "../modals/StartCamera";
-import { Button, Dialog, DialogActions, DialogContent } from "@mui/material";
-import { Link } from "react-router-dom";
-
-const initialCameras = [
-  { title: "Cámara 1", estado: "Offline" },
-  { title: "Cámara 2", estado: "Offline" },
-  { title: "Cámara 3", estado: "Offline" },
-];
+import {
+  Button,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Typography,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom"; // Importa useNavigate
 
 function PageInicio() {
+  const navigate = useNavigate(); // Usa useNavigate en lugar de useHistory
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPermissionDialogOpen, setIsPermissionDialogOpen] = useState(false);
   const [selectedCameraTitle, setSelectedCameraTitle] = useState("");
-  const [cameras, setCameras] = useState(initialCameras);
+  const [cameras, setCameras] = useState([]);
+
+  useEffect(() => {
+    const checkPermissions = async () => {
+      try {
+        const devices = await navigator.mediaDevices.enumerateDevices();
+        const videoDevices = devices.filter(
+          (device) => device.kind === "videoinput"
+        );
+
+        if (videoDevices.length > 0) {
+          const stream = await navigator.mediaDevices.getUserMedia({
+            video: true,
+          });
+          stream.getTracks().forEach((track) => track.stop());
+
+          const cameraList = videoDevices.map((device, index) => ({
+            title: `Cámara ${index + 1} - ${device.label || "Sin etiqueta"}`,
+            deviceId: device.deviceId,
+          }));
+          setCameras(cameraList);
+          setIsPermissionDialogOpen(false);
+        } else {
+          setIsPermissionDialogOpen(true);
+        }
+      } catch (error) {
+        console.error("Error al verificar permisos:", error);
+        setIsPermissionDialogOpen(true);
+      }
+    };
+
+    checkPermissions();
+  }, []);
 
   const handleCardClick = (title) => {
     setSelectedCameraTitle(title);
@@ -28,47 +63,57 @@ function PageInicio() {
     setIsModalOpen(false);
   };
 
-  const handleStart = () => {
-    // Cambia el estado de la cámara seleccionada a "online"
-    const updatedCameras = cameras.map((camera) => ({
-      ...camera,
-      estado: camera.title === selectedCameraTitle ? "Online" : "Offline",
-    }));
+  const handlePermissionRequest = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ video: true });
+      stream.getTracks().forEach((track) => track.stop());
+      setIsPermissionDialogOpen(false);
 
-    // Si hay otra cámara en línea, la pone en línea automáticamente
-    const onlineCamerasCount = updatedCameras.filter(
-      (camera) => camera.estado === "Online"
-    ).length;
-    if (onlineCamerasCount > 1) {
-      updatedCameras.forEach((camera) => {
-        if (
-          camera.title !== selectedCameraTitle &&
-          camera.estado === "Online"
-        ) {
-          camera.estado = " Offline";
-        }
-      });
+      const devices = await navigator.mediaDevices.enumerateDevices();
+      const videoDevices = devices.filter(
+        (device) => device.kind === "videoinput"
+      );
+      const cameraList = videoDevices.map((device, index) => ({
+        title: `Cámara ${index + 1} - ${device.label || "Sin etiqueta"}`,
+        deviceId: device.deviceId,
+      }));
+      setCameras(cameraList);
+    } catch (error) {
+      console.error("Error al solicitar permisos:", error);
+      alert("No se pudieron obtener los permisos para acceder a la cámara.");
     }
+  };
 
-    setCameras(updatedCameras);
+  const handleStart = (courseInfo) => {
     setIsModalOpen(false);
+    navigate("/ViewCamera", { state: { courseInfo } });
   };
 
   return (
     <div>
       <Header />
       <Box sx={{ flexGrow: 1 }} className="box">
-        <Grid container rowSpacing={3} columnSpacing={{ xs: 1, sm: 2, md: 3 }}>
-          {cameras.map((camera, index) => (
-            <Grid item xs={2} key={index}>
-              <CameraCard
-                title={camera.title}
-                estado={camera.estado}
-                onClick={() => handleCardClick(camera.title)}
-              />
-            </Grid>
-          ))}
-        </Grid>
+        {cameras.length > 0 ? (
+          <Grid
+            container
+            rowSpacing={3}
+            columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+          >
+            {cameras.map((camera, index) => (
+              <Grid item xs={2} key={index}>
+                <CameraCard
+                  title={camera.title}
+                  onClick={() => handleCardClick(camera.title)}
+                />
+              </Grid>
+            ))}
+          </Grid>
+        ) : (
+          <Typography variant="h3" align="center" color="textSecondary">
+            En este momento no se detectan cámaras, por favor verifica los
+            dispositivos multimedia
+          </Typography>
+        )}
       </Box>
 
       <Dialog open={isModalOpen}>
@@ -76,24 +121,26 @@ function PageInicio() {
           <StartCamera
             handleClose={handleClose}
             cameraTitle={selectedCameraTitle}
-            professorName={"Jorge Velazco"}
             onStart={handleStart}
           />
         </DialogContent>
-        <DialogActions>
-          <div className="button-container">
-            <Link to={"/ViewCamera"}>
-              <Button sx={{ mt: 2 }} onClick={handleStart}>
-                Iniciar
-              </Button>
-            </Link>
+      </Dialog>
 
-            <Button sx={{ mt: 2 }} color="error" onClick={handleClose}>
-              Cancelar
-            </Button>
-          </div>
+      <Dialog open={isPermissionDialogOpen}>
+        <DialogTitle>Permiso para acceder a la cámara</DialogTitle>
+        <DialogContent>
+          <Typography>
+            Esta aplicación necesita acceder a su cámara. Por favor, otorgue
+            permisos para continuar.
+          </Typography>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={handlePermissionRequest} color="primary">
+            Otorgar permisos
+          </Button>
         </DialogActions>
       </Dialog>
+
       <Footer />
     </div>
   );

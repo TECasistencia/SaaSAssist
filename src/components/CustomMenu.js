@@ -44,7 +44,7 @@ function CustomMenu() {
           },
           {
             label: "Cámaras",
-            to: "/ViewAddCamera",
+            to: "/CameraTable",
           },
           {
             label: "Alumnos",

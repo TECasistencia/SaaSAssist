@@ -3,6 +3,7 @@ import { AuthContext } from "./AuthContext";
 import { Navigate, Outlet } from "react-router-dom";
 import { Route, Routes } from "react-router-dom";
 
+import PageInicio from "../components/PageInicio";
 import ViewCamera from "../components/ViewCamera";
 import ViewDataHistoryClass from "../components/ViewDataHistoryClass";
 import ViewDataHistoryDate from "../components/ViewDataHistoryDate";
@@ -35,19 +36,15 @@ const PrivateRoute = () => {
   if (isAdmin) {
     return (
       <Routes>
-        <Route path="/" element={<Outlet />}>
-          <Route path="/CursoTable" element={<CursoTable />} />
-          <Route
-            path="/ViewDataHistoryClass"
-            element={<ViewDataHistoryClass />}
-          />
-          <Route path="/ViewCamera" element={<ViewCamera />} />
-          <Route
-            path="/ViewDataHistoryDate"
-            element={<ViewDataHistoryDate />}
-          />
-          <Route path="/ViewDataHistoryAG" element={<ViewDataHistoryAG />} />
-        </Route>
+        <Route path="/" element={<PageInicio />}></Route>
+        <Route
+          path="/ViewDataHistoryClass"
+          element={<ViewDataHistoryClass />}
+        />
+        <Route path="/ViewDataHistoryDate" element={<ViewDataHistoryDate />} />
+        <Route path="/ViewDataHistoryAG" element={<ViewDataHistoryAG />} />
+        <Route path="/ViewCamera" element={<ViewCamera />} />
+        <Route path="/CursoTable" element={<CursoTable />} />
       </Routes>
     );
   }
