@@ -43,10 +43,6 @@ function CustomMenu() {
             to: "/PeriodTable",
           },
           {
-            label: "Cámaras",
-            to: "/CameraTable",
-          },
-          {
             label: "Alumnos",
             to: "/StudentTable",
           },

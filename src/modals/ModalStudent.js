@@ -1,4 +1,4 @@
-import { Box, Button, TextField, Autocomplete } from "@mui/material";
+import { Box, Button, TextField, Autocomplete, Alert } from "@mui/material";
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import AlumnoController from "../serviceApi/AlumnoController";
@@ -16,8 +16,7 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
   const [countrysOptions, setCountrysOptions] = useState([]);
   const [cantonesOptions, setCantonesOptions] = useState([]);
   const [districtOptions, setDistrictOptions] = useState([]);
-  const [selectedIdentifyName, setSelectedIdentifyName] = useState(null);
-  const [currentFieldName, setCurrentFieldName] = useState("");
+  const [error, setError] = useState("");
 
   const optionsIdentify = [
     { id: 1, nombre: "Cedula de identidad" },
@@ -92,6 +91,25 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
   };
 
   const handleAdd = async () => {
+    if (
+      !personData.firstName ||
+      !personData.firstLastName ||
+      !personData.typeIdentify ||
+      !personData.numberIdentify ||
+      !personData.country ||
+      !personData.state ||
+      !personData.canton ||
+      !personData.district ||
+      !personData.city ||
+      !personData.direction ||
+      !personData.cellphoneNumber ||
+      !personData.mail ||
+      !studentData.fechaIngreso
+    ) {
+      setError("Todos los campos son obligatorios.");
+      return;
+    }
+
     try {
       const personResponse = await PersonaController.InsertPerson(
         personData,
@@ -107,9 +125,30 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
       }
     } catch (error) {
       console.error("Error al insertar el alumno:", error);
+      setError("Error al insertar el alumno. Intente nuevamente.");
     }
   };
+
   const handleEdit = async () => {
+    if (
+      !personData.firstName ||
+      !personData.firstLastName ||
+      !personData.typeIdentify ||
+      !personData.numberIdentify ||
+      !personData.country ||
+      !personData.state ||
+      !personData.canton ||
+      !personData.district ||
+      !personData.city ||
+      !personData.direction ||
+      !personData.cellphoneNumber ||
+      !personData.mail ||
+      !studentData.fechaIngreso
+    ) {
+      setError("Todos los campos son obligatorios.");
+      return;
+    }
+
     try {
       await PersonaController.UpdatePerson(
         personData,
@@ -120,11 +159,8 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
       handleClose();
     } catch (error) {
       console.error("Error al modificar el alumno:", error);
+      setError("Error al modificar el alumno. Intente nuevamente.");
     }
-  };
-
-  const handleFocus = (fieldName) => {
-    setCurrentFieldName(fieldName);
   };
 
   return (
@@ -146,7 +182,6 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
             name="firstName"
             value={personData.firstName}
             onChange={handlePersonChange}
-            onFocus={() => handleFocus("firstName")}
           />
           <TextField
             id="outlined-secondName"
@@ -154,7 +189,6 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
             name="secondName"
             value={personData.secondName}
             onChange={handlePersonChange}
-            onFocus={() => handleFocus("secondName")}
           />
           <TextField
             id="outlined-firstLastName"
@@ -162,7 +196,6 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
             name="firstLastName"
             value={personData.firstLastName}
             onChange={handlePersonChange}
-            onFocus={() => handleFocus("firstLastName")}
           />
           <TextField
             id="outlined-secondLastName"
@@ -170,7 +203,6 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
             name="secondLastName"
             value={personData.secondLastName}
             onChange={handlePersonChange}
-            onFocus={() => handleFocus("secondLastName")}
           />
           <Autocomplete
             value={
@@ -204,7 +236,6 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
             name="numberIdentify"
             value={personData.numberIdentify}
             onChange={handlePersonChange}
-            onFocus={() => handleFocus("numberIdentify")}
           />
           <Autocomplete
             value={
@@ -315,7 +346,6 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
             name="city"
             value={personData.city}
             onChange={handlePersonChange}
-            onFocus={() => handleFocus("city")}
           />
           <TextField
             id="outlined-direction"
@@ -323,7 +353,6 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
             name="direction"
             value={personData.direction}
             onChange={handlePersonChange}
-            onFocus={() => handleFocus("direction")}
           />
           <TextField
             id="outlined-postalMail"
@@ -331,7 +360,6 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
             name="postalMail"
             value={personData.postalMail}
             onChange={handlePersonChange}
-            onFocus={() => handleFocus("postalMail")}
           />
           <TextField
             id="outlined-cellphoneNumber"
@@ -339,7 +367,6 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
             name="cellphoneNumber"
             value={personData.cellphoneNumber}
             onChange={handlePersonChange}
-            onFocus={() => handleFocus("cellphoneNumber")}
           />
           <TextField
             id="outlined-mail"
@@ -347,7 +374,6 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
             name="mail"
             value={personData.mail}
             onChange={handlePersonChange}
-            onFocus={() => handleFocus("mail")}
           />
           <TextField
             id="outlined-fechaIngreso"
@@ -360,6 +386,22 @@ const ModalStudent = ({ isEdit, student, handleClose }) => {
             value={studentData.fechaIngreso}
             onChange={handleChange}
           />
+
+          {error && (
+            <Alert
+              severity="error"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                mt: 2,
+              }}
+            >
+              {error}
+            </Alert>
+          )}
+
           <br />
           <div className="button-container">
             <Button sx={{ mt: 2 }} onClick={isEdit ? handleEdit : handleAdd}>

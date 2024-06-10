@@ -12,7 +12,6 @@ import ViewDataHistoryDate from "./components/ViewDataHistoryDate";
 import ViewDataHistoryAG from "./components/ViewDataHistoryAG";
 import GuestTable from "./components/GuestTable";
 import StudentTable from "./components/StudentTable.js";
-import CameraTable from "./components/CameraTable";
 import SpaceTable from "./components/SpaceTable";
 import CursoTable from "./components/CursoTable";
 import PeriodTable from "./components/PeriodTable";
@@ -36,7 +35,6 @@ function App() {
               element={<ViewDataHistoryClass />}
             />
             <Route path="/SpaceTable" element={<SpaceTable />} />
-            <Route path="/CameraTable" element={<CameraTable />} />
             <Route path="/ViewCamera" element={<ViewCamera />} />
             <Route
               path="/ViewDataHistoryDate"

@@ -17,17 +17,17 @@ import {
   DialogTitle,
   DialogContent,
   DialogActions,
+  Tooltip,
 } from "@mui/material";
 import SearchIcon from "@mui/icons-material/Search";
 import AlumnoController from "../serviceApi/AlumnoController";
 import InscripcionController from "../serviceApi/InscripcionController";
-import ImagenReferenciaController from "../serviceApi/ImagenReferenciaController"; // Importar el controlador
+import ImagenReferenciaController from "../serviceApi/ImagenReferenciaController";
 import { AuthContext } from "../contexts/AuthContext";
 
 const ModalAssignVideoStudent = ({ id, idEdicionCurso, handleClose }) => {
   const { dataUser, token } = useContext(AuthContext);
   const [alumnos, setAlumnos] = useState([]);
-  const [inscritos, setInscritos] = useState([]);
   const [filteredAlumnos, setFilteredAlumnos] = useState([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [page, setPage] = useState(0);
@@ -56,7 +56,6 @@ const ModalAssignVideoStudent = ({ id, idEdicionCurso, handleClose }) => {
         );
 
       setAlumnos(fetchedAlumnos);
-      setInscritos(fetchedInscritos);
       filterInscritos(fetchedAlumnos, fetchedInscritos);
       setUrlVideo(fetchUrls);
 
@@ -165,7 +164,7 @@ const ModalAssignVideoStudent = ({ id, idEdicionCurso, handleClose }) => {
       }
 
       setSuccessDialogOpen(true);
-      handleClose(); // Cerrar el modal al enviar correctamente
+      handleClose();
     } catch (error) {
       setErrorMessage("Error al comprobar las URLs o al guardar los datos.");
       setErrorDialogOpen(true);
@@ -299,12 +298,12 @@ const ModalAssignVideoStudent = ({ id, idEdicionCurso, handleClose }) => {
                           }
                           placeholder="URL del video"
                           fullWidth
-                          error={validUrls[alumno.id] === false} // Mostrar error en el campo si la URL no es válida
+                          error={validUrls[alumno.id] === false}
                           helperText={
                             validUrls[alumno.id] === false
                               ? "Verifica que el URL sea correcto"
                               : ""
-                          } // Mostrar helperText si la URL no es válida
+                          }
                         />
                       </TableCell>
                     </TableRow>
@@ -329,13 +328,17 @@ const ModalAssignVideoStudent = ({ id, idEdicionCurso, handleClose }) => {
               width: "100%",
             }}
           >
-            <Button
-              sx={{ mt: 2, mr: 1 }}
-              onClick={handleEnviar}
-              disabled={!allUrlsFilled}
-            >
-              Enviar
-            </Button>
+            <Tooltip title="Los URLs ingresados serán comprobados para su correcta inserción en la base de datos">
+              <span>
+                <Button
+                  sx={{ mt: 2, mr: 1 }}
+                  onClick={handleEnviar}
+                  disabled={!allUrlsFilled}
+                >
+                  Enviar
+                </Button>
+              </span>
+            </Tooltip>
             <Button sx={{ mt: 2 }} color="error" onClick={handleClose}>
               Cerrar
             </Button>
