@@ -1,4 +1,4 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, TextField, Alert } from "@mui/material";
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import PeriodoController from "../serviceApi/PeriodoController";
@@ -12,6 +12,7 @@ const ModalPeriod = ({ isEdit, period, handleClose }) => {
     fechaFin: isEdit ? formatDate(period.fechaFin) : "",
     idOrganizacion: parseInt(dataUser.IdOrganizacion),
   });
+  const [error, setError] = useState("");
 
   function formatDate(date) {
     const d = new Date(date);
@@ -30,20 +31,32 @@ const ModalPeriod = ({ isEdit, period, handleClose }) => {
   };
 
   const handleAdd = async () => {
+    if (!periodData.nombre || !periodData.fechaInicio || !periodData.fechaFin) {
+      setError("Todos los campos son obligatorios.");
+      return;
+    }
+
     try {
       await PeriodoController.InsertPeriod(periodData, token);
       handleClose();
     } catch (error) {
       console.error("Error al insertar el periodo:", error);
+      setError("Error al insertar el periodo. Intente nuevamente.");
     }
   };
 
   const handleEdit = async () => {
+    if (!periodData.nombre || !periodData.fechaInicio || !periodData.fechaFin) {
+      setError("Todos los campos son obligatorios.");
+      return;
+    }
+
     try {
       await PeriodoController.UpdatePeriod(periodData, token);
       handleClose();
     } catch (error) {
       console.error("Error al modificar el periodo:", error);
+      setError("Error al modificar el periodo. Intente nuevamente.");
     }
   };
 
@@ -89,6 +102,21 @@ const ModalPeriod = ({ isEdit, period, handleClose }) => {
             value={periodData.fechaFin}
             onChange={handleChange}
           />
+
+          {error && (
+            <Alert
+              severity="error"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                mt: 2,
+              }}
+            >
+              {error}
+            </Alert>
+          )}
 
           <br />
           <div className="button-container">

@@ -1,10 +1,11 @@
 import React, { useState, useContext } from "react";
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, TextField, Alert } from "@mui/material";
 import CursoController from "../serviceApi/CursoController";
 import { AuthContext } from "../contexts/AuthContext";
 
 const ModalCurso = ({ isEdit, data, handleClose }) => {
   const { dataUser, token } = useContext(AuthContext);
+  const [error, setError] = useState(null);
 
   const [courseData, setCourseData] = useState({
     id: isEdit && data ? data.id : "",
@@ -23,7 +24,24 @@ const ModalCurso = ({ isEdit, data, handleClose }) => {
     }));
   };
 
+  const validateForm = () => {
+    if (
+      !courseData.nombre ||
+      !courseData.codigoCurso ||
+      !courseData.nombreVariante ||
+      !courseData.descripcion
+    ) {
+      setError("Todos los campos son obligatorios.");
+      return false;
+    }
+    return true;
+  };
+
   const handleSave = async () => {
+    if (!validateForm()) {
+      return;
+    }
+
     try {
       if (isEdit) {
         await CursoController.UpdateCurso(courseData, token);
@@ -33,6 +51,9 @@ const ModalCurso = ({ isEdit, data, handleClose }) => {
       handleClose();
     } catch (error) {
       console.error("Error al guardar el curso:", error);
+      setError(
+        "Ocurrió un error al guardar el curso. Por favor, inténtelo de nuevo."
+      );
     }
   };
 
@@ -77,6 +98,19 @@ const ModalCurso = ({ isEdit, data, handleClose }) => {
             value={courseData.descripcion || ""}
             onChange={handleChange}
           />
+          {error && (
+            <Alert
+              severity="error"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+              }}
+            >
+              {error}
+            </Alert>
+          )}
 
           <div className="button-container">
             <Button sx={{ mt: 2 }} onClick={handleSave}>

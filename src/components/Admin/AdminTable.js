@@ -49,16 +49,22 @@ const AdminTable = () => {
     fetchAdmins();
   }, [fetchAdmins]);
 
-  const handleOpenEdit = (admin) => {
+  const handleOpenEdit = async (admin) => {
+    await fetchAdmins(); // Asegurarte de obtener los datos más recientes antes de abrir el modal
     setAdminProcess(admin);
     setOpenEdit(true);
   };
-
   const handleOpenAdd = () => setOpenAdd(true);
 
-  const handleCloseEdit = () => setOpenEdit(false);
+  const handleCloseEdit = () => {
+    setOpenEdit(false);
+    fetchAdmins(); // Llamar a fetchAdmins para obtener los datos actualizados
+  };
 
-  const handleCloseAdd = () => setOpenAdd(false);
+  const handleCloseAdd = () => {
+    setOpenAdd(false);
+    fetchAdmins();
+  };
 
   const handleChangePage = (event, newPage) => setPage(newPage);
 
@@ -68,12 +74,14 @@ const AdminTable = () => {
   };
 
   const handleOpenDelete = (admin) => {
-    console.log(admin);
     setAdminProcess(admin);
     setOpenDelete(true);
   };
 
-  const handleCloseDelete = () => setOpenDelete(false);
+  const handleCloseDelete = () => {
+    setOpenDelete(false);
+    fetchAdmins();
+  };
 
   const handleDelete = async () => {
     try {
@@ -84,11 +92,10 @@ const AdminTable = () => {
 
       if (result) {
         try {
-          const confirm = await UsuarioController.DeleteUser(
+          await UsuarioController.DeleteUser(
             adminProcess.nombre_Usuario,
             token
           );
-          console.log("Eliminado correctamente ", confirm);
           handleCloseDelete();
         } catch (error) {
           console.error("Error: ", error);

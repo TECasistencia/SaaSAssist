@@ -119,7 +119,6 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
           result.id,
           token
         );
-        console.log("Nuevo usuario agregado:", newUser);
         handleClose();
       }
     } catch (error) {
@@ -134,7 +133,6 @@ const ModalAdmin = ({ isEdit, admin, handleClose }) => {
         admin.id,
         token
       );
-      console.log("Se realizo: ", result);
       handleClose();
     } catch (error) {
       console.error("Error al modificar la persona:", error);

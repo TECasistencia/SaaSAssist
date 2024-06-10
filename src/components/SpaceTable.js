@@ -55,7 +55,8 @@ const SpaceTable = () => {
     fetchSpaces();
   }, [fetchSpaces]);
 
-  const handleOpenAdd = () => {
+  const handleOpenAdd = async () => {
+    await fetchSpaces();
     setOpenAdd(true);
   };
 
@@ -67,6 +68,7 @@ const SpaceTable = () => {
   const handleOpenEdit = (space) => {
     setSpaceEdit(space);
     setOpenEdit(true);
+    fetchSpaces();
   };
 
   const handleCloseEdit = () => {
@@ -74,20 +76,21 @@ const SpaceTable = () => {
     fetchSpaces();
   };
 
-  const handleClickOpenDelete = (space) => {
+  const handleClickOpenDelete = async (space) => {
+    await fetchSpaces();
     setSpaceToDelete(space);
     setOpenDelete(true);
   };
 
   const handleCloseDelete = () => {
     setOpenDelete(false);
+    fetchSpaces();
   };
 
   const handleDelete = async () => {
     try {
       await EspacioController.DeleteSpace(spaceToDelete.id, token);
       handleCloseDelete();
-      fetchSpaces();
     } catch (error) {
       console.error("Error deleting space:", error);
     }
