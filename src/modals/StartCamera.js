@@ -34,6 +34,8 @@ function StartCamera({ cameraTitle, onStart, handleClose }) {
     Alumnos: [],
   });
 
+
+
   const fetchCursos = useCallback(async () => {
     try {
       const cursos = await CursoController.GetCursos(

@@ -2,15 +2,18 @@ import { BACKEND } from "../serviceApi/Backend";
 
 const FaceRecognitionController = {
 
-  RunScriptTrainModel: async (data) => {
+  RunScriptDownloadAndGenerate: async (data) => {
     try {
-      const response = await fetch(BACKEND + "FaceRecognition/TrainModel", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
-      });
+      const response = await fetch(
+        BACKEND + "FaceRecognition/DownloadAndGenerate",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(data),
+        }
+      );
 
       if (!response.ok) {
         const errorData = await response.json();
@@ -42,46 +45,60 @@ const FaceRecognitionController = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(
-          `React: Error al ejecutar el script: ${errorData.errors}`
-        );
+        throw new Error(`Error al ejecutar el script: ${errorData.errors}`);
       } else {
-        const data = await response.json();
-        return data;
+        const result = await response.json();
+
+        localStorage.setItem("taskId", result.taskId); // Almacenar el taskId en localStorage
+        return result;
       }
     } catch (error) {
-      console.error("React: Error de conexión con el servidor: ", error);
+      console.error("Error de conexión con el servidor: ", error);
       throw error;
     }
   },
 
-  RunScriptFaceRecognitionCNN: async (data) => {
+  CancelScript: async (taskId) => {
     try {
       const response = await fetch(
-        BACKEND + "FaceRecognition/RunFaceRecognitionCNN",
+        BACKEND + "FaceRecognition/CancelFaceRecognition",
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            idCurso: data.idCurso,
-            cameraIndex: data.cameraIndex,
-          }),
+          body: JSON.stringify({ taskId }),
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(
-          `React: Error al ejecutar el script: ${errorData.errors}`
-        );
+        throw new Error(`Error al cancelar el script: ${errorData.errors}`);
       } else {
-        const data = await response.json();
-        return data;
+        //localStorage.removeItem("taskId"); // Eliminar el taskId de localStorage
+        return await response.json();
       }
     } catch (error) {
-      console.error("React: Error de conexión con el servidor: ", error);
+      console.error("Error de conexión con el servidor: ", error);
+      throw error;
+    }
+  },
+
+  CheckTaskStatus: async (taskId) => {
+    try {
+      const response = await fetch(
+        BACKEND + `FaceRecognition/TaskStatus?taskId=${taskId}`
+      );
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(
+          `Error al consultar el estado de la tarea: ${errorData.errors}`
+        );
+      } else {
+        return await response.json();
+      }
+    } catch (error) {
+      console.error("Error de conexión con el servidor: ", error);
       throw error;
     }
   },
