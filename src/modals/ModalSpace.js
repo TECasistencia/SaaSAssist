@@ -1,4 +1,4 @@
-import { Box, Button, TextField } from "@mui/material";
+import { Box, Button, TextField, Alert } from "@mui/material";
 import React, { useState, useContext } from "react";
 import { AuthContext } from "../contexts/AuthContext";
 import EspacioController from "../serviceApi/EspacioController";
@@ -11,6 +11,7 @@ const ModalSpace = ({ isEdit, space, handleClose }) => {
     capacity: isEdit ? space.capacidad : "",
     idOrganizacion: parseInt(dataUser.IdOrganizacion),
   });
+  const [error, setError] = useState("");
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -21,20 +22,32 @@ const ModalSpace = ({ isEdit, space, handleClose }) => {
   };
 
   const handleAdd = async () => {
+    if (!spaceData.name || !spaceData.capacity) {
+      setError("Todos los campos son obligatorios.");
+      return;
+    }
+
     try {
       await EspacioController.InsertSpace(spaceData, token);
       handleClose();
     } catch (error) {
       console.error("Error al insertar el espacio:", error);
+      setError("Error al insertar el espacio. Intente nuevamente.");
     }
   };
 
   const handleEdit = async () => {
+    if (!spaceData.name || !spaceData.capacity) {
+      setError("Todos los campos son obligatorios.");
+      return;
+    }
+
     try {
       await EspacioController.UpdateSpace(spaceData, token);
       handleClose();
     } catch (error) {
       console.error("Error al modificar el espacio:", error);
+      setError("Error al modificar el espacio. Intente nuevamente.");
     }
   };
 
@@ -66,6 +79,21 @@ const ModalSpace = ({ isEdit, space, handleClose }) => {
             onChange={handleChange}
             type="number"
           />
+
+          {error && (
+            <Alert
+              severity="error"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                mt: 2,
+              }}
+            >
+              {error}
+            </Alert>
+          )}
 
           <br />
           <div className="button-container">

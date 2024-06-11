@@ -1,5 +1,5 @@
 import { createContext, useState } from "react";
-import { jwtDecode } from "jwt-decode"; // Importar jwtDecode como una función nombrada
+import { jwtDecode } from "jwt-decode"; // Importar jwtDecode correctamente
 import { BACKEND } from "../serviceApi/Backend";
 
 export const AuthContext = createContext();
@@ -52,21 +52,19 @@ const AuthProvider = ({ children }) => {
         }),
       });
 
-      const contentType = response.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        throw new Error("Respuesta inesperada del servidor");
-      }
-
       const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(
+          data.message ||
+            "Error al iniciar sesión, verifica los datos ingresados y vuelve a intentarlo"
+        );
+      }
 
       const token = data.token;
       setToken(token);
 
       const decodedToken = jwtDecode(token);
-
-      if (!response.ok) {
-        throw new Error("Error al iniciar sesión");
-      }
 
       if (decodedToken.Activo === "True") {
         setIsAuthenticated(true);
@@ -77,8 +75,7 @@ const AuthProvider = ({ children }) => {
 
       return true;
     } catch (error) {
-      console.error("Error de autenticación:", error.message);
-      return false;
+      throw error;
     }
   };
 

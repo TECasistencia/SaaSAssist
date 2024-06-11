@@ -7,6 +7,7 @@ import {
   InputLabel,
   OutlinedInput,
   TextField,
+  Alert,
 } from "@mui/material";
 import Visibility from "@mui/icons-material/Visibility";
 import VisibilityOff from "@mui/icons-material/VisibilityOff";
@@ -17,6 +18,7 @@ const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [username, setUsername] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState(""); // Estado para el mensaje de error
   const { authenticate } = useContext(AuthContext);
   const navigate = useNavigate(); // Obtener la función navigate de React Router
 
@@ -27,13 +29,14 @@ const Login = () => {
   };
 
   const handleLogin = async () => {
+    setError(""); // Limpiar cualquier error previo
     try {
       const resultado = await authenticate(username, password);
       if (resultado) {
         navigate("/");
       }
     } catch (error) {
-      console.error("Error al iniciar sesión:", error.message);
+      setError(error.message); // Establecer mensaje de error
     }
   };
 
@@ -41,6 +44,11 @@ const Login = () => {
     <div className="cont">
       <div className="container-login" style={{ gap: "1rem" }}>
         <h2>Inicio de sesión</h2>
+        {error && (
+          <Alert severity="error" sx={{ width: "100%", textAlign: "center" }}>
+            {error}
+          </Alert>
+        )}
         <TextField
           sx={{ width: "100%" }}
           label="Nombre de usuario"

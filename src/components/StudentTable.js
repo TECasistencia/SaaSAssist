@@ -105,6 +105,15 @@ const StudentTable = () => {
       dialogRef.current.focus();
     }
   };
+
+  const getFullName = (student) => {
+    const { primer_Nombre, segundo_Nombre, primer_Apellido, segundo_Apellido } =
+      student;
+    return `${primer_Nombre} ${
+      segundo_Nombre ? segundo_Nombre + " " : ""
+    }${primer_Apellido} ${segundo_Apellido}`;
+  };
+
   return (
     <>
       <Header />
@@ -142,7 +151,7 @@ const StudentTable = () => {
                   <TableCell component="th" scope="row">
                     {student.id}
                   </TableCell>
-                  <TableCell align="left">{student.primer_Nombre}</TableCell>
+                  <TableCell align="left">{getFullName(student)}</TableCell>
                   <TableCell align="left">{student.fecha_Ingreso}</TableCell>
                   <TableCell align="right" sx={{ display: "flex" }}>
                     <div className="action-btn">

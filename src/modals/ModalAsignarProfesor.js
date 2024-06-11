@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext, useCallback } from "react";
-import { Box, Button, TextField, Autocomplete } from "@mui/material";
+import { Box, Button, TextField, Autocomplete, Alert } from "@mui/material";
 import EspacioController from "../serviceApi/EspacioController";
 import PeriodoController from "../serviceApi/PeriodoController";
 import UsuarioController from "../serviceApi/UsuarioController";
@@ -29,6 +29,7 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
     idProfesor: curso.edicionCursos?.idUsuario || null,
     nombreProfesor: curso.nombreAdmin || "",
   });
+  const [error, setError] = useState("");
 
   const fetchSpaces = useCallback(async () => {
     try {
@@ -126,6 +127,18 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
   };
 
   const handleSave = async () => {
+    if (
+      !courseData.idEspacio ||
+      !courseData.idPeriodo ||
+      !courseData.idProfesor ||
+      !courseData.nombreEdicionCurso ||
+      !courseData.fechaInicio ||
+      !courseData.fechaFin
+    ) {
+      setError("Todos los campos son obligatorios.");
+      return;
+    }
+
     try {
       const newEdicionCurso = {
         IdCurso: courseData.idCurso,
@@ -152,6 +165,7 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
       handleClose();
     } catch (error) {
       console.error("Error al asignar el profesor:", error);
+      setError("Error al asignar el profesor. Intente nuevamente.");
     }
   };
 
@@ -242,6 +256,20 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
             value={courseData.fechaFin || ""}
             onChange={handleChange}
           />
+
+          {error && (
+            <Alert
+              severity="error"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+              }}
+            >
+              {error}
+            </Alert>
+          )}
 
           <div className="button-container">
             <Button sx={{ mt: 2 }} onClick={handleSave}>

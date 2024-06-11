@@ -3,7 +3,6 @@ import { BACKEND } from "./Backend";
 const PersonaController = {
   InsertPerson: async (person, token) => {
     try {
-      console.log(person);
       const response = await fetch(BACKEND + "Persona/Insertar", {
         method: "POST",
         headers: {

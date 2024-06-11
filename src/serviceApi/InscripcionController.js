@@ -3,7 +3,6 @@ import { BACKEND } from "./Backend";
 const InscripcionController = {
   InsertMultipleInscripciones: async (inscripciones, token) => {
     try {
-      console.log("Inscripciones a enviar:", inscripciones);
       const response = await fetch(BACKEND + "Inscripcion/InsertarMultiples", {
         method: "POST",
         headers: {
@@ -13,21 +12,16 @@ const InscripcionController = {
         body: JSON.stringify(inscripciones),
       });
 
-      console.log("Respuesta de la API:", response);
-
       if (!response.ok) {
         const errorResponse = await response.json();
-        console.error("Respuesta de error de la API:", errorResponse);
         throw new Error(
           errorResponse.error || "Error al insertar las inscripciones"
         );
       }
 
       const data = await response.json();
-      console.log("Datos recibidos de la API:", data);
       return data;
     } catch (error) {
-      console.error("Error al insertar las inscripciones:", error);
       throw error;
     }
   },
@@ -45,13 +39,12 @@ const InscripcionController = {
       );
 
       if (!response.ok) {
-        throw new Error("Error al buscar las inscripciones");
+        throw new Error("No se encontraron inscripciones");
       }
 
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Error al buscar las inscripciones:", error);
       throw error;
     }
   },
@@ -71,7 +64,6 @@ const InscripcionController = {
 
       return true;
     } catch (error) {
-      console.error("Error al eliminar la inscripción:", error);
       throw error;
     }
   },
@@ -98,7 +90,6 @@ const InscripcionController = {
       const data = await response.json();
       return data;
     } catch (error) {
-      console.error("Error al modificar la inscripción:", error);
       throw error;
     }
   },
