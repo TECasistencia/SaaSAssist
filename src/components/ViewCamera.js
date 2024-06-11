@@ -27,28 +27,33 @@ function ViewCamera() {
   const [status, setStatus] = useState("");
   const [latestImage, setLatestImage] = useState(null);
 
+  // Efecto para inicializar la verificación si hay un taskId en el localStorage al cargar el componente
   useEffect(() => {
-    // se corre todo el rato para estar actualizando y prenguntando el estado de la tarea, si esta corriendo se actualiza
-    const taskId = localStorage.getItem("taskId");
+    const initialTaskId = localStorage.getItem("taskId");
+    if (initialTaskId) {
+      setTaskId(initialTaskId);
+    }
+  }, []);
+
+  // Efecto para manejar cambios en el taskId
+  useEffect(() => {
     if (taskId) {
       const interval = setInterval(async () => {
         try {
           const response = await FaceRecognitionController.CheckTaskStatus(
             taskId
           );
-          console.log(
-            "respuesta CheckTaskStatus useEffect: " + response.status
-          );
+          console.log("CheckTaskStatus: " + response.status);
           if (response.status === "Canceled" || response.status === "Error") {
-            clearInterval(interval);
             localStorage.removeItem("taskId");
             setIsLoading(false);
             setTaskId(null);
+            clearInterval(interval);
           } else if (response.status === "Running") {
-            setIsLoading(true);
-            setTaskId(taskId);
             const imageBlob = await FaceRecognitionController.GetLatestImage();
-            setLatestImage(imageBlob);
+            if (imageBlob !== 404) {
+              setLatestImage(imageBlob);
+            }
           }
           setResponse(response.status);
         } catch (error) {
@@ -60,7 +65,7 @@ function ViewCamera() {
     } else {
       console.log("No task id");
     }
-  }, []);
+  }, [taskId]);
 
   const handleStartFaceRecognition = async () => {
     try {
@@ -77,13 +82,11 @@ function ViewCamera() {
       if (response.taskId) {
         setIsLoading(true);
         setTaskId(response.taskId);
+        localStorage.setItem("taskId", response.taskId);
       }
       // datos que devuelve al ejecutar el script de reconocimiento
       console.log(
         "response RunScriptFaceRecognition taskId: " + response.taskId
-      );
-      console.log(
-        "response RunScriptFaceRecognition message: " + response.message
       );
     } catch (error) {
       setError(error.message);
@@ -91,24 +94,26 @@ function ViewCamera() {
     }
   };
 
-  // puede que este metodo se necesite agregar lo que pasa cuando se echa para atras en la pagina o si se cierra, 
+  // puede que este metodo se necesite agregar lo que pasa cuando se echa para atras en la pagina o si se cierra,
   // tambien ver si se guarda para que siga si vuelve a abrirse
   const handleCancelFaceRecognition = async () => {
     const taskId = localStorage.getItem("taskId");
     if (taskId) {
       try {
+        // Se da la indicacion para cancelar el script
         const response = await FaceRecognitionController.CancelScript(taskId);
-        console.log("respuesta CancelScript: " + response.message);
-
-        const status = await checkStatus();
 
         setResponse(response.message);
-        if (status === "Canceled") {
-          localStorage.removeItem("taskId");
-          setIsLoading(false);
-          setTaskId(null);
-        } else if (status === "Not Found") {
-          console.log("no se encontro la task en el API");
+        if (response.message !== "Task not found") {
+          const status = await checkStatus();
+          if (status === "Canceled") {
+            localStorage.removeItem("taskId");
+            setIsLoading(false);
+            setTaskId(null);
+            setLatestImage(null);
+          } else if (status === "Not Found") {
+            console.log("no se encontro la task en el API");
+          }
         }
       } catch (error) {
         console.log("Error CancelScript: " + error.message);
@@ -144,38 +149,52 @@ function ViewCamera() {
       style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
     >
       <Header />
-      <Box sx={{ flex: "1 0 auto" }}>
-        <Button
-          sx={{ top: 16, left: 16 }}
-          variant="outlined"
-          onClick={handleOpenModal}
-        >
-          Lista de Asistencia
-        </Button>
+      <Box
+        sx={{
+          flex: "1 0 auto",
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          position: "relative",
+          textAlign: "center",
+        }}
+      >
+        <div>
+          <Button
+            sx={{ position: "absolute", top: 20, left: 20 }}
+            variant="outlined"
+            onClick={handleOpenModal}
+          >
+            Lista de Asistencia
+          </Button>
 
-        <Button
-          sx={{ top: 16, left: 16 }}
-          variant="outlined"
-          onClick={handleStartFaceRecognition}
-          disabled={isLoading}
-        >
-          {isLoading ? (
-            <CircularProgress size={24} />
-          ) : (
-            "Iniciar Reconocimiento"
+          {!isLoading && !latestImage && (
+            <Button variant="outlined" onClick={handleStartFaceRecognition}>
+              Iniciar Reconocimiento
+            </Button>
           )}
-        </Button>
-        <Button
-          sx={{ top: 16, left: 16 }}
-          variant="outlined"
-          onClick={handleCancelFaceRecognition}
-          disabled={taskId === null}
-        >
-          Cancelar
-        </Button>
+          {isLoading && !latestImage && (
+            <CircularProgress size={50} sx={{ marginTop: "20%" }} />
+          )}
 
-        {/* {latestImage && <img src={latestImage} alt="Última captura" />} */}
-
+          {latestImage && (
+            <>
+              <img
+                src={latestImage}
+                alt="Reconocimiento Facial"
+                style={{ maxWidth: "100%", maxHeight: "80vh" }}
+              />
+              <Button
+                sx={{ position: "absolute", top: 20, right: 20 }}
+                variant="outlined"
+                onClick={handleCancelFaceRecognition}
+              >
+                Cancelar
+              </Button>
+            </>
+          )}
+        </div>
         <Dialog
           open={isModalOpen}
           onClose={handleCloseModal}

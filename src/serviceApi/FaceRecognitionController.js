@@ -1,7 +1,6 @@
 import { BACKEND } from "../serviceApi/Backend";
 
 const FaceRecognitionController = {
-
   RunScriptDownloadAndGenerate: async (data) => {
     try {
       const response = await fetch(
@@ -75,7 +74,6 @@ const FaceRecognitionController = {
         const errorData = await response.json();
         throw new Error(`Error al cancelar el script: ${errorData.errors}`);
       } else {
-        //localStorage.removeItem("taskId"); // Eliminar el taskId de localStorage
         return await response.json();
       }
     } catch (error) {
@@ -109,8 +107,8 @@ const FaceRecognitionController = {
       if (response.ok) {
         const blob = await response.blob();
         return URL.createObjectURL(blob);
-      } else {
-        console.error("Error fetching the image");
+      } else if (response.status === 404) {
+        return 404;
       }
     } catch (error) {
       console.error("Error fetching the image: ", error);
