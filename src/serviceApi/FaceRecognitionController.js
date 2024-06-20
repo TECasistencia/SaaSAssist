@@ -1,13 +1,14 @@
 import { BACKEND } from "../serviceApi/Backend";
 
 const FaceRecognitionController = {
-  RunScriptDownloadAndGenerate: async (data) => {
+  RunDownloadAndGenerate: async (data, token) => {
     try {
       const response = await fetch(
         BACKEND + "FaceRecognition/DownloadAndGenerate",
         {
           method: "POST",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify(data),
@@ -16,7 +17,17 @@ const FaceRecognitionController = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(`Error al ejecutar el script: ${errorData.errors}`);
+        if (errorData.errors) {
+          const errors = Object.values(errorData.errors).flat().join(", ");
+          throw new Error(
+            `Error al ejecutar el script DownloadAndGenerate: ${errors}`
+          );
+        } else {
+          const errorMessage =
+            errorData.message ||
+            "Error al ejecutar el script DownloadAndGenerate";
+          throw new Error(errorMessage);
+        }
       } else {
         return await response.json();
       }
@@ -26,28 +37,32 @@ const FaceRecognitionController = {
     }
   },
 
-  RunScriptFaceRecognition: async (data) => {
+  RunScriptFaceRecognition: async (data, token) => {
     try {
       const response = await fetch(
         BACKEND + "FaceRecognition/RunFaceRecognition",
         {
           method: "POST",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
-          body: JSON.stringify({
-            idCurso: data.idCurso,
-            cameraIndex: data.cameraIndex,
-          }),
+          body: JSON.stringify(data),
         }
       );
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(`Error al ejecutar el script: ${errorData.errors}`);
+        if (errorData.errors) {
+          const errors = Object.values(errorData.errors).flat().join(", ");
+          throw new Error(`Error al ejecutar el script: ${errors}`);
+        } else {
+          const errorMessage =
+            errorData.message || "Error al ejecutar el script";
+          throw new Error(errorMessage);
+        }
       } else {
         const result = await response.json();
-
         localStorage.setItem("taskId", result.taskId); // Almacenar el taskId en localStorage
         return result;
       }
@@ -57,13 +72,14 @@ const FaceRecognitionController = {
     }
   },
 
-  CancelScript: async (taskId) => {
+  CancelScript: async (taskId, token) => {
     try {
       const response = await fetch(
         BACKEND + "FaceRecognition/CancelFaceRecognition",
         {
           method: "POST",
           headers: {
+            Authorization: `Bearer ${token}`,
             "Content-Type": "application/json",
           },
           body: JSON.stringify({ taskId }),
@@ -72,7 +88,14 @@ const FaceRecognitionController = {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(`Error al cancelar el script: ${errorData.errors}`);
+        if (errorData.errors) {
+          const errors = Object.values(errorData.errors).flat().join(", ");
+          throw new Error(`Error al cancelar el script: ${errors}`);
+        } else {
+          const errorMessage =
+            errorData.message || "Error al cancelar el script";
+          throw new Error(errorMessage);
+        }
       } else {
         return await response.json();
       }
@@ -82,16 +105,30 @@ const FaceRecognitionController = {
     }
   },
 
-  CheckTaskStatus: async (taskId) => {
+  CheckTaskStatus: async (taskId, token) => {
     try {
       const response = await fetch(
-        BACKEND + `FaceRecognition/TaskStatus?taskId=${taskId}`
+        BACKEND + `FaceRecognition/TaskStatus?taskId=${taskId}`,
+        {
+          method: "GET",
+          headers: {
+            Authorization: `Bearer ${token}`,
+            "Content-Type": "application/json",
+          }
+        }
       );
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(
-          `Error al consultar el estado de la tarea: ${errorData.errors}`
-        );
+        if (errorData.errors) {
+          const errors = Object.values(errorData.errors).flat().join(", ");
+          throw new Error(
+            `Error al consultar el estado de la tarea: ${errors}`
+          );
+        } else {
+          const errorMessage =
+            errorData.message || "Error al consultar el estado de la tarea";
+          throw new Error(errorMessage);
+        }
       } else {
         return await response.json();
       }
@@ -101,9 +138,11 @@ const FaceRecognitionController = {
     }
   },
 
-  GetLatestImage: async () => {
+  GetLatestImage: async (idCurso) => {
     try {
-      const response = await fetch(BACKEND + "FaceRecognition/GetLatestImage");
+      const response = await fetch(
+        BACKEND + `FaceRecognition/GetLatestImage?idCurso=${idCurso}`
+      );
       if (response.ok) {
         const blob = await response.blob();
         return URL.createObjectURL(blob);

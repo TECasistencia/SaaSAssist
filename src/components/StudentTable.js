@@ -23,6 +23,7 @@ import Header from "./Header";
 import ModalStudent from "../modals/ModalStudent";
 import AlumnoController from "../serviceApi/AlumnoController";
 import { AuthContext } from "../contexts/AuthContext";
+import Footer from "./Footer";
 
 const StudentTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -232,6 +233,7 @@ const StudentTable = () => {
           </DialogActions>
         </Dialog>
       </div>
+      <Footer />
     </>
   );
 };

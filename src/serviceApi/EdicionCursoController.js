@@ -3,6 +3,7 @@ import { BACKEND } from "../serviceApi/Backend";
 const EdicionCursoController = {
   InsertEdicionCurso: async (edicionCurso, token) => {
     try {
+      console.log(edicionCurso);
       const response = await fetch(BACKEND + "EdicionCurso/Insertar", {
         method: "POST",
         headers: {
@@ -10,13 +11,13 @@ const EdicionCursoController = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          idCurso: edicionCurso.IdCurso,
-          idPeriodo: edicionCurso.IdPeriodo,
-          idEspacio: edicionCurso.IdEspacio,
-          idPersona: edicionCurso.IdProfesor,
-          nombreGrupo: edicionCurso.NombreGrupo,
-          fechaInicio: edicionCurso.FechaInicio,
-          fechaFin: edicionCurso.FechaFin,
+          IdCurso: edicionCurso.IdCurso,
+          IdPeriodo: edicionCurso.IdPeriodo,
+          IdEspacio: edicionCurso.IdEspacio,
+          IdPersona: edicionCurso.IdProfesor,
+          NombreGrupo: edicionCurso.NombreGrupo,
+          FechaInicio: edicionCurso.FechaInicio,
+          FechaFin: edicionCurso.FechaFin,
         }),
       });
 
@@ -88,13 +89,13 @@ const EdicionCursoController = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: id,
-          nombreGrupo: edicionCurso.NombreGrupo,
-          idEspacio: edicionCurso.IdEspacio,
-          idPeriodo: edicionCurso.IdPeriodo,
-          idPersona: edicionCurso.IdProfesor,
-          fechaInicio: edicionCurso.FechaInicio,
-          fechaFin: edicionCurso.FechaFin,
+          Id: id,
+          NombreGrupo: edicionCurso.NombreGrupo,
+          IdEspacio: edicionCurso.IdEspacio,
+          IdPeriodo: edicionCurso.IdPeriodo,
+          IdPersona: edicionCurso.IdProfesor,
+          FechaInicio: edicionCurso.FechaInicio,
+          FechaFin: edicionCurso.FechaFin,
         }),
       });
 

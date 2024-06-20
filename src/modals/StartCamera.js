@@ -7,6 +7,7 @@ import {
   Autocomplete,
   TextField,
   Button,
+  Alert,
 } from "@mui/material";
 import "../styles/styleStartCamera.css";
 import CursoController from "../serviceApi/CursoController";
@@ -18,8 +19,9 @@ import PeriodoController from "../serviceApi/PeriodoController";
 import { AuthContext } from "../contexts/AuthContext";
 
 function StartCamera({ cameraTitle, onStart, handleClose }) {
-  const { dataUser, token } = useContext(AuthContext);
+  const { dataUser, token, isAdmin } = useContext(AuthContext);
   const [courseOptions, setCourseOptions] = useState([]);
+  const [error, setError] = useState("");
   const [courseInfo, setCourseInfo] = useState({
     IdCurso: "",
     NombreCurso: "",
@@ -33,8 +35,6 @@ function StartCamera({ cameraTitle, onStart, handleClose }) {
     IdEdicionCurso: "",
     Alumnos: [],
   });
-
-
 
   const fetchCursos = useCallback(async () => {
     try {
@@ -71,7 +71,7 @@ function StartCamera({ cameraTitle, onStart, handleClose }) {
                     );
 
                   const usuario = fetchedUsers.find(
-                    (user) => user.id === edicion.idUsuario
+                    (user) => user.id === edicion.idPersona
                   );
 
                   const espacio = fetchedSpaces.find(
@@ -115,18 +115,27 @@ function StartCamera({ cameraTitle, onStart, handleClose }) {
           }
         })
       );
-
-      setCourseOptions(cursosConEdicionesYInscripciones);
+      if (isAdmin) {
+        const filtered = cursosConEdicionesYInscripciones.filter(
+          (curso) =>
+            curso.edicionCursos &&
+            curso.edicionCursos[0].idPersona === parseInt(dataUser.IdPersona)
+        );
+        setCourseOptions(filtered);
+      } else {
+        setCourseOptions(cursosConEdicionesYInscripciones);
+      }
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  }, [dataUser.IdOrganizacion, token]);
+  }, [dataUser.IdOrganizacion, token, dataUser.IdPersona, isAdmin]);
 
   useEffect(() => {
     fetchCursos();
   }, [fetchCursos]);
 
   const handleCourseChange = (event, value) => {
+    setError("");
     if (value) {
       const edicionCurso = value.edicionCursos[0];
       const nombreProfesor =
@@ -179,7 +188,17 @@ function StartCamera({ cameraTitle, onStart, handleClose }) {
   };
 
   const handleStart = () => {
-    onStart(courseInfo);
+    if (courseInfo.IdCurso !== "") {
+      if (courseInfo.IdEdicionCurso !== "") {
+        console.log(courseInfo);
+
+        onStart(courseInfo);
+      } else {
+        setError("Falta informacion en el curso");
+      }
+    } else {
+      setError("No hay un curso seleccionado");
+    }
   };
 
   return (
@@ -234,6 +253,21 @@ function StartCamera({ cameraTitle, onStart, handleClose }) {
                 readOnly: true,
               }}
             />
+          )}
+
+          {error && (
+            <Alert
+              severity="error"
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                textAlign: "center",
+                mt: 2,
+              }}
+            >
+              {error}
+            </Alert>
           )}
           <Box mt={2}>
             <Button color="primary" onClick={handleStart}>

@@ -86,8 +86,9 @@ const ModalAssignStudents = ({ idEdicionCurso, handleClose }) => {
       const inscripcion = (
         await InscripcionController.SearchInscripcion(idEdicionCurso, token)
       ).find((inscripcion) => inscripcion.idAlumno === alumnoToDeselect);
+
       if (inscripcion) {
-        await InscripcionController.DeleteInscripcion(inscripcion.id, token);
+        const responseDelete = await InscripcionController.DeleteInscripcion(inscripcion.id, token);
       }
       setSelectedAlumnos((prevSelected) =>
         prevSelected.filter((alumno) => alumno.id !== alumnoToDeselect)

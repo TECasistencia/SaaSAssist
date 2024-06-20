@@ -13,7 +13,7 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
     idCurso: curso.id,
     idEspacio: curso.edicionCursos ? curso.edicionCursos.idEspacio : null,
     idPeriodo: curso.edicionCursos ? curso.edicionCursos.idPeriodo : null,
-    idProfesor: curso.edicionCursos ? curso.edicionCursos.idProfesor : null,
+    idPersona: curso.edicionCursos ? curso.edicionCursos.idPersona : null,
     nombreEdicionCurso: curso.edicionCursos
       ? curso.edicionCursos.nombreGrupo
       : "",
@@ -26,7 +26,7 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
   const [periods, setPeriods] = useState([]);
   const [profesores, setProfesores] = useState([]);
   const [selectedProfesor, setSelectedProfesor] = useState({
-    idProfesor: curso.edicionCursos?.idUsuario || null,
+    idPersona: curso.edicionCursos?.idUsuario || null,
     nombreProfesor: curso.nombreAdmin || "",
   });
   const [error, setError] = useState("");
@@ -68,14 +68,14 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
             } ${profesor.segundo_Apellido}` === curso.nombreAdmin
         );
         setSelectedProfesor({
-          idProfesor: selected?.id || curso.edicionCursos?.idUsuario || null,
+          idPersona: selected?.id || curso.edicionCursos?.idPersona || null,
           nombreProfesor: curso.nombreAdmin || "",
         });
       }
     } catch (error) {
       console.error("Error fetching professors:", error);
     }
-  }, [curso.nombreAdmin, curso.edicionCursos?.idUsuario, token]);
+  }, [curso.nombreAdmin, curso.edicionCursos?.idPersona, token]);
 
   useEffect(() => {
     fetchSpaces();
@@ -113,7 +113,7 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
 
   const handleSelectProfesor = (event, value) => {
     setSelectedProfesor({
-      idProfesor: value ? value.id : null,
+      idPersona: value ? value.id : null,
       nombreProfesor: value
         ? `${value.primer_Nombre} ${value.segundo_Nombre || ""} ${
             value.primer_Apellido
@@ -122,7 +122,7 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
     });
     setCourseData((prevState) => ({
       ...prevState,
-      idProfesor: value ? value.id : null,
+      idPersona: value ? value.id : null,
     }));
   };
 
@@ -130,7 +130,7 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
     if (
       !courseData.idEspacio ||
       !courseData.idPeriodo ||
-      !courseData.idProfesor ||
+      !courseData.idPersona ||
       !courseData.nombreEdicionCurso ||
       !courseData.fechaInicio ||
       !courseData.fechaFin
@@ -144,9 +144,9 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
         IdCurso: courseData.idCurso,
         IdPeriodo: courseData.idPeriodo,
         IdEspacio: courseData.idEspacio,
-        IdProfesor: courseData.idProfesor
-          ? courseData.idProfesor
-          : selectedProfesor.idProfesor,
+        IdProfesor: courseData.idPersona
+          ? courseData.idPersona
+          : selectedProfesor.idPersona,
         NombreGrupo: courseData.nombreEdicionCurso,
         FechaInicio: courseData.fechaInicio,
         FechaFin: courseData.fechaFin,
@@ -228,7 +228,7 @@ const ModalAsignarProfesor = ({ curso, handleClose }) => {
             )}
             value={
               profesores.find(
-                (profesor) => profesor.id === selectedProfesor.idProfesor
+                (profesor) => profesor.id === selectedProfesor.idPersona
               ) || null
             }
             onChange={handleSelectProfesor}

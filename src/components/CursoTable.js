@@ -15,6 +15,8 @@ import {
   DialogActions,
   Button,
   Box,
+  CircularProgress,
+  Typography,
 } from "@mui/material";
 import React, { useState, useEffect, useContext, useCallback } from "react";
 import AddCircleIcon from "@mui/icons-material/AddCircle";
@@ -35,8 +37,9 @@ import EdicionCursoController from "../serviceApi/EdicionCursoController";
 import InscripcionController from "../serviceApi/InscripcionController";
 import UsuarioController from "../serviceApi/UsuarioController";
 import AlumnoController from "../serviceApi/AlumnoController";
-import ImagenReferenciaController from "../serviceApi/ImagenReferenciaController";
 import { AuthContext } from "../contexts/AuthContext";
+import ImagenReferenciaController from "../serviceApi/ImagenReferenciaController";
+import FaceRecognitionController from "../serviceApi/FaceRecognitionController";
 
 const CursoTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -52,6 +55,10 @@ const CursoTable = () => {
   const [filteredCursos, setFilteredCursos] = useState([]);
   const [errors, setErrors] = useState([]); // Estado para almacenar el error
   const { dataUser, token, isAdmin } = useContext(AuthContext);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [success, setSuccess] = useState(false);
+  const [openLoadingDialog, setOpenLoadingDialog] = useState(false);
 
   const dialogRef = React.useRef(null);
   const fetchCursos = useCallback(async () => {
@@ -152,11 +159,13 @@ const CursoTable = () => {
     const filtered = isAdmin
       ? Cursos.filter(
           (curso) =>
-            curso.edicionCursos && curso.edicionCursos.idPersona === dataUser.id
+            curso.edicionCursos &&
+            curso.edicionCursos.idPersona === parseInt(dataUser.IdPersona)
         )
       : Cursos;
+
     setFilteredCursos(filtered);
-  }, [isAdmin, dataUser.id, Cursos]);
+  }, [isAdmin, dataUser.IdPersona, Cursos]);
 
   const handleOpenAdd = () => {
     setOpenAdd(true);
@@ -246,6 +255,10 @@ const CursoTable = () => {
     fetchCursos();
   };
 
+  const handleCloseLoadingDialog = () => {
+    setOpenLoadingDialog(false);
+  };
+
   const handleEntrenar = async (curso) => {
     const alumnoImagenMap = {};
 
@@ -257,28 +270,51 @@ const CursoTable = () => {
 
       curso.edicionCursos.inscripcions.forEach((inscripcion) => {
         const idAlumno = inscripcion.idAlumno;
+        const idInscripcion = inscripcion.id;
         const imagenReferencia = curso.imagenesReferencia.find(
           (imagen) => imagen.iD_Alumno === idAlumno
         );
 
         const alumno = fetchedAlumnos.find((alumno) => alumno.id === idAlumno);
-
+        console.log();
         if (imagenReferencia && alumno) {
           const nombreCompleto = `${alumno.primer_Nombre} ${
             alumno.segundo_Nombre || ""
           } ${alumno.primer_Apellido} ${alumno.segundo_Apellido}`.toLowerCase();
-          alumnoImagenMap[nombreCompleto + "_" + idAlumno] =
-            imagenReferencia.ruta_Archivo;
+          alumnoImagenMap[nombreCompleto + "_" + idInscripcion] =
+          imagenReferencia.ruta_Archivo;
         }
       });
-
+      
       const cursoData = {
-        cursoId: curso.id,
-        alumnos: alumnoImagenMap,
+        idCurso: String(curso.id),
+        videos_alumnos: alumnoImagenMap,
       };
-      // Aquí puedes agregar la lógica adicional necesaria para entrenar el modelo con cursoData
+      
+      handleDownloadAndGenerate(cursoData);
     } catch (error) {
       console.error("Error fetching alumnos:", error);
+    }
+  };
+
+  const handleDownloadAndGenerate = async (data) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(false);
+    setOpenLoadingDialog(true);
+
+    try {
+      const response = await FaceRecognitionController.RunDownloadAndGenerate(
+        data, token
+      );
+      if (response.result === "") {
+        setSuccess(true);
+      }
+    } catch (error) {
+      console.error("Error:", error);
+      setError("Error al generar los datos");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -349,7 +385,7 @@ const CursoTable = () => {
                             <Tooltip
                               title={
                                 curso.edicionCursos &&
-                                curso.edicionCursos.idUsuario
+                                curso.edicionCursos.idPersona
                                   ? "Editar Profesor"
                                   : "Asignar Profesor"
                               }
@@ -538,24 +574,41 @@ const CursoTable = () => {
               ) : null}
             </DialogContent>
           </Dialog>
-          {/*
-          <Tooltip
-            title={
-              <ul>
-                {errors
-                  .filter((error) => error != null)
-                  .map((error, index) => (
-                    <li key={index}>{error}</li>
-                  ))}
-              </ul>
-            }
-            arrow
-            placement="right"
-          >
-            <span>
-              <Button color="error">Advertencias !</Button>
-            </span>
-          </Tooltip> */}
+          <Dialog open={openLoadingDialog} onClose={handleCloseLoadingDialog}>
+            <DialogTitle>
+              {loading
+                ? "Procesando... esta acción puede tardar varios minutos"
+                : error
+                ? "Error"
+                : "Éxito"}
+            </DialogTitle>
+            <DialogContent>
+              {loading ? (
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <CircularProgress />
+                </div>
+              ) : (
+                <Typography>
+                  {error
+                    ? `Error: ${error}`
+                    : "El proceso se completó exitosamente."}
+                </Typography>
+              )}
+            </DialogContent>
+            <DialogActions>
+              {!loading && (
+                <Button onClick={handleCloseLoadingDialog} color="primary">
+                  Cerrar
+                </Button>
+              )}
+            </DialogActions>
+          </Dialog>
         </div>
       </Box>
       <Footer />

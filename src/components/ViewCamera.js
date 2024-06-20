@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import Header from "./Header";
 import Footer from "./Footer";
 import "../styles/styleViewCamera.css";
@@ -9,14 +9,17 @@ import {
   Dialog,
   DialogActions,
   DialogContent,
-  DialogTitle,
-  DialogContentText,
   CircularProgress,
+  Typography,
 } from "@mui/material";
-import { useLocation } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import FaceRecognitionController from "../serviceApi/FaceRecognitionController";
+import AsistenciaController from "../serviceApi/AsistenciaController";
+import { AuthContext } from "../contexts/AuthContext";
+import InscripcionController from "../serviceApi/InscripcionController";
 
 function ViewCamera() {
+  const { token } = useContext(AuthContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const courseInfo = location.state?.courseInfo;
@@ -24,9 +27,17 @@ function ViewCamera() {
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [taskId, setTaskId] = useState(localStorage.getItem("taskId") || null);
-  const [status, setStatus] = useState("");
   const [latestImage, setLatestImage] = useState(null);
 
+  const navigate = useNavigate();
+
+  // formato de fecha
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString("es-ES", {
+    day: "2-digit",
+    month: "long",
+    year: "numeric",
+  });
   // Efecto para inicializar la verificación si hay un taskId en el localStorage al cargar el componente
   useEffect(() => {
     const initialTaskId = localStorage.getItem("taskId");
@@ -35,22 +46,67 @@ function ViewCamera() {
     }
   }, []);
 
-  // Efecto para manejar cambios en el taskId
+  const handleBuscarAsistencias = useCallback(async () => {
+    try {
+      const todayDate = new Date();
+
+      const yyyy = todayDate.getFullYear();
+      const mm = String(todayDate.getMonth() + 1).padStart(2, "0");
+      const dd = String(todayDate.getDate()).padStart(2, "0");
+
+      const date = `${yyyy}-${mm}-${dd}`;
+
+      const asistencias = await AsistenciaController.BuscarAsistenciaPorFecha(
+        date,
+        token
+      );
+      if (asistencias) {
+        const inscripciones = await InscripcionController.SearchInscripcion(
+          courseInfo.IdEdicionCurso,
+          token
+        );
+        if (inscripciones) {
+        }
+        asistencias.forEach((asistencia) => {
+          const presente = inscripciones.find(
+            (inscripcion) => inscripcion.id === asistencia.idInscripcion
+          );
+          if (presente) {
+            courseInfo.Alumnos.forEach((alumno) => {
+              if (alumno.idAlumno === presente.idAlumno) {
+                if (!alumno.asistencia[0]) {
+                  alumno.asistencia.push(true);
+                }
+              }
+            });
+          }
+        });
+      }
+    } catch (error) {
+      console.error("Error al buscar asistencias por fecha:", error);
+    }
+  }, [courseInfo.Alumnos, courseInfo.IdEdicionCurso, token]);
+
   useEffect(() => {
     if (taskId) {
       const interval = setInterval(async () => {
         try {
+          handleBuscarAsistencias();
           const response = await FaceRecognitionController.CheckTaskStatus(
-            taskId
+            taskId,
+            token
           );
-          console.log("CheckTaskStatus: " + response.status);
+          // console.log("CheckTaskStatus: " + response.status);
           if (response.status === "Canceled" || response.status === "Error") {
             localStorage.removeItem("taskId");
             setIsLoading(false);
             setTaskId(null);
             clearInterval(interval);
           } else if (response.status === "Running") {
-            const imageBlob = await FaceRecognitionController.GetLatestImage();
+            // cambiarlo al dato del curso recibido del inicio
+            const imageBlob = await FaceRecognitionController.GetLatestImage(
+              courseInfo.IdCurso
+            );
             if (imageBlob !== 404) {
               setLatestImage(imageBlob);
             }
@@ -62,21 +118,19 @@ function ViewCamera() {
         }
       }, 5000);
       return () => clearInterval(interval);
-    } else {
-      console.log("No task id");
     }
-  }, [taskId]);
-
+  }, [courseInfo.IdCurso, handleBuscarAsistencias, taskId, token]);
   const handleStartFaceRecognition = async () => {
     try {
       const data = {
-        idCurso: "IA_IC101",
+        idCurso: String(courseInfo.IdCurso),
         cameraIndex: 0,
       };
 
       // se corre el script y si el resultado es exitoso, se almacena el taskId en el local storage
       const response = await FaceRecognitionController.RunScriptFaceRecognition(
-        data
+        data,
+        token
       );
       setTimeout(2000);
       if (response.taskId) {
@@ -94,14 +148,15 @@ function ViewCamera() {
     }
   };
 
-  // puede que este metodo se necesite agregar lo que pasa cuando se echa para atras en la pagina o si se cierra,
-  // tambien ver si se guarda para que siga si vuelve a abrirse
   const handleCancelFaceRecognition = async () => {
     const taskId = localStorage.getItem("taskId");
     if (taskId) {
       try {
         // Se da la indicacion para cancelar el script
-        const response = await FaceRecognitionController.CancelScript(taskId);
+        const response = await FaceRecognitionController.CancelScript(
+          taskId,
+          token
+        );
 
         setResponse(response.message);
         if (response.message !== "Task not found") {
@@ -111,6 +166,7 @@ function ViewCamera() {
             setIsLoading(false);
             setTaskId(null);
             setLatestImage(null);
+            handleEndClass();
           } else if (status === "Not Found") {
             console.log("no se encontro la task en el API");
           }
@@ -128,7 +184,8 @@ function ViewCamera() {
     if (taskId) {
       try {
         const response = await FaceRecognitionController.CheckTaskStatus(
-          taskId
+          taskId,
+          token
         );
         return response.status;
       } catch (error) {
@@ -144,11 +201,23 @@ function ViewCamera() {
     setIsModalOpen(false);
   };
 
+  const handleEndClass = () => {
+    // Redireccionar al inicio
+    navigate("/");
+  };
   return (
     <div
-      style={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
+      style={{
+        display: "flex",
+        flexDirection: "column",
+        minHeight: "100vh",
+        textAlign: "center",
+      }}
     >
       <Header />
+      <Typography variant="h5" sx={{ marginTop: "1rem", marginBottom: "1rem" }}>
+        Asistencia del curso {courseInfo?.NombreCurso} - {formattedDate}
+      </Typography>
       <Box
         sx={{
           flex: "1 0 auto",
@@ -162,13 +231,16 @@ function ViewCamera() {
       >
         <div>
           <Button
-            sx={{ position: "absolute", top: 20, left: 20 }}
+            sx={{ position: "absolute", top: 0, left: 20 }}
             variant="outlined"
             onClick={handleOpenModal}
           >
             Lista de Asistencia
           </Button>
 
+          {/* <Button variant="outlined" onClick={handleBuscarAsistencias}>
+            test
+          </Button> */}
           {!isLoading && !latestImage && (
             <Button variant="outlined" onClick={handleStartFaceRecognition}>
               Iniciar Reconocimiento
@@ -177,7 +249,6 @@ function ViewCamera() {
           {isLoading && !latestImage && (
             <CircularProgress size={50} sx={{ marginTop: "20%" }} />
           )}
-
           {latestImage && (
             <>
               <img
@@ -186,11 +257,11 @@ function ViewCamera() {
                 style={{ maxWidth: "100%", maxHeight: "80vh" }}
               />
               <Button
-                sx={{ position: "absolute", top: 20, right: 20 }}
+                sx={{ position: "absolute", top: 0, right: 20 }}
                 variant="outlined"
                 onClick={handleCancelFaceRecognition}
               >
-                Cancelar
+                Finalizar Clase
               </Button>
             </>
           )}

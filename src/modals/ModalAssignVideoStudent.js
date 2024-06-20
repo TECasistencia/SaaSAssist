@@ -171,13 +171,17 @@ const ModalAssignVideoStudent = ({ id, idEdicionCurso, handleClose }) => {
     }
   };
 
+  const isValidGoogleDriveUrl = (url) => {
+    const regex =
+      /^https:\/\/drive\.google\.com\/file\/d\/[a-zA-Z0-9_-]+\/view\?usp=(drive_link|sharing)$/;
+    return regex.test(url);
+  };
+
   const handleComprobarUrl = (alumnoId, url) => {
     return new Promise((resolve, reject) => {
       if (url) {
-        const fileId = url.match(/[-\w]{25,}/); // Extrae el ID del archivo del enlace de Google Drive
-        if (fileId) {
-          const directUrl = `https://drive.google.com/file/d/${fileId[0]}/preview`;
-          fetch(directUrl)
+        if (isValidGoogleDriveUrl(url)) {
+          fetch(url)
             .then((response) => {
               if (response.ok) {
                 setValidUrls((prevValidUrls) => ({
@@ -213,7 +217,7 @@ const ModalAssignVideoStudent = ({ id, idEdicionCurso, handleClose }) => {
             ...prevValidUrls,
             [alumnoId]: false,
           }));
-          reject(new Error("URL de Google Drive no válido"));
+          reject(new Error("El enlace de Google Drive no es válido"));
         }
       } else {
         setValidUrls((prevValidUrls) => ({

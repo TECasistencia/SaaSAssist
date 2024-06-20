@@ -24,6 +24,7 @@ import ModalSpace from "../modals/ModalSpace";
 import EspacioController from "../serviceApi/EspacioController";
 
 import { AuthContext } from "../contexts/AuthContext";
+import Footer from "./Footer";
 
 const SpaceTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -229,6 +230,7 @@ const SpaceTable = () => {
           </DialogActions>
         </Dialog>
       </div>
+      <Footer />
     </>
   );
 };
