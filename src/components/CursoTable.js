@@ -520,7 +520,7 @@ const CursoTable = () => {
             aria-describedby="alert-dialog-description"
           >
             <DialogTitle id="alert-dialog-title">
-              {"¿Está seguro que desea eliminar la clase?"}
+              {"¿Está seguro que desea eliminar el curso?"}
             </DialogTitle>
             <DialogActions>
               <Button
