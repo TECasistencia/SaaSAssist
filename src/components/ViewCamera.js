@@ -23,8 +23,6 @@ function ViewCamera() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const location = useLocation();
   const courseInfo = location.state?.courseInfo;
-  const [response, setResponse] = useState("");
-  const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [taskId, setTaskId] = useState(localStorage.getItem("taskId") || null);
   const [latestImage, setLatestImage] = useState(null);
@@ -111,7 +109,6 @@ function ViewCamera() {
               setLatestImage(imageBlob);
             }
           }
-          setResponse(response.status);
         } catch (error) {
           console.error("Error checking task status:", error);
           clearInterval(interval);
@@ -143,8 +140,7 @@ function ViewCamera() {
         "response RunScriptFaceRecognition taskId: " + response.taskId
       );
     } catch (error) {
-      setError(error.message);
-      setResponse("");
+      console.error("Error starting faceRecognition:", error.message);
     }
   };
 
@@ -157,8 +153,6 @@ function ViewCamera() {
           taskId,
           token
         );
-
-        setResponse(response.message);
         if (response.message !== "Task not found") {
           const status = await checkStatus();
           if (status === "Canceled") {
