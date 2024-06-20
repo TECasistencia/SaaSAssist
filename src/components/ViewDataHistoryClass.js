@@ -11,9 +11,9 @@ function ViewDataHistoryClass() {
 
   // Datos de ejemplo: aulas
   const classrooms = [
-    { id: 1, name: "Clase 101" },
-    { id: 2, name: "Clase 102" },
-    { id: 3, name: "Clase 103" },
+    { id: 1, name: "Inteligencia Artifial" },
+    { id: 2, name: "Taller de programación" },
+    { id: 3, name: "Bases de datos 1" },
   ];
 
   // Función para manejar cambios en la consulta de búsqueda
@@ -42,7 +42,7 @@ function ViewDataHistoryClass() {
             type="text"
             value={searchQuery}
             onChange={handleSearchChange}
-            placeholder="Buscar por clase..."
+            placeholder="Buscar por Curso..."
             variant="outlined"
             className="search-input"
           />
@@ -55,7 +55,7 @@ function ViewDataHistoryClass() {
           </Button>
         </Box>
         {/* Título "Aulas" */}
-        <h2 className="header-text">Clases:</h2>
+        <h2 className="header-text">Cursos:</h2>
         {/* Lista de aulas */}
         <div className="list-container">
           <List className="list">

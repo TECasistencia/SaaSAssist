@@ -35,7 +35,7 @@ function ViewListAssist({ alumnos }) {
                 match.segundo_Nombre ? match.segundo_Nombre + " " : ""
               }${match.primer_Apellido} ${match.segundo_Apellido}`
             : "Unknown",
-          present: false,
+          present: alumno.asistencia[0] ? alumno.asistencia[0] : false,
         };
       });
 

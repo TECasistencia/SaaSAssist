@@ -10,11 +10,11 @@ const CursoController = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          idOrganizacion: curso.idOrganizacion,
-          codigoCurso: curso.codigoCurso,
-          nombre: curso.nombre,
-          nombreVariante: curso.nombreVariante,
-          descripcion: curso.descripcion,
+          IdOrganizacion: curso.idOrganizacion,
+          CodigoCurso: curso.codigoCurso,
+          Nombre: curso.nombre,
+          NombreVariante: curso.nombreVariante,
+          Descripcion: curso.descripcion,
         }),
       });
 
@@ -39,11 +39,11 @@ const CursoController = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: curso.id,
-          codigoCurso: curso.codigoCurso,
-          nombre: curso.nombre,
-          nombreVariante: curso.nombreVariante,
-          descripcion: curso.descripcion,
+          Id: curso.id,
+          CodigoCurso: curso.codigoCurso,
+          Nombre: curso.nombre,
+          NombreVariante: curso.nombreVariante,
+          Descripcion: curso.descripcion,
         }),
       });
 

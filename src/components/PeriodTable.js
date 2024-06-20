@@ -23,6 +23,7 @@ import Header from "./Header";
 import ModalPeriod from "../modals/ModalPeriod";
 import PeriodoController from "../serviceApi/PeriodoController";
 import { AuthContext } from "../contexts/AuthContext";
+import Footer from "./Footer";
 
 const PeriodTable = () => {
   const [rowsPerPage, setRowsPerPage] = useState(5);
@@ -227,6 +228,7 @@ const PeriodTable = () => {
           </DialogActions>
         </Dialog>
       </div>
+      <Footer />
     </>
   );
 };

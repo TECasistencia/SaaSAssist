@@ -77,9 +77,9 @@ const InscripcionController = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: inscripcion.id,
-          fechaInscripcion: inscripcion.fechaInscripcion,
-          estado: inscripcion.estado,
+          Id: inscripcion.id,
+          FechaInscripcion: inscripcion.fechaInscripcion,
+          Estado: inscripcion.estado,
         }),
       });
 

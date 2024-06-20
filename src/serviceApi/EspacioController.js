@@ -11,8 +11,8 @@ const EspacioController = {
         },
         body: JSON.stringify({
           IdOrganizacion: space.idOrganizacion,
-          nombre: space.name,
-          capacidad: space.capacity,
+          Nombre: space.name,
+          Capacidad: space.capacity,
         }),
       });
 
@@ -62,9 +62,9 @@ const EspacioController = {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          id: space.id,
-          nombre: space.name,
-          capacidad: space.capacity,
+          Id: space.id,
+          Nombre: space.name,
+          Capacidad: space.capacity,
         }),
       });
 

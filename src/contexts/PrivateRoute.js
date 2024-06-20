@@ -21,6 +21,7 @@ const PrivateRoute = () => {
   if (isInvited) {
     return (
       <Routes>
+        <Route path="/" element={<ViewDataHistoryClass />}></Route>
         <Route
           path="/ViewDataHistoryClass"
           element={<ViewDataHistoryClass />}
